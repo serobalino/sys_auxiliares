@@ -3,11 +3,11 @@
 
 Ha escrito un mensaje
 <br>
-Nombre:<b>{{$nombre}}</b>
+Nombre:<strong>{{$nombre}}</strong>
 <br>
-Correo:<b>{{$correo}}</b>
+Correo:{{$correo}}
 <br>
-<k>{{$mensaje}}</k>
+{{$mensaje}}
 <br><br><br>
 Recuerda que es un mensaje automatizado,<br>
 {{ config('app.name') }}

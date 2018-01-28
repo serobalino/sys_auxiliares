@@ -16,9 +16,8 @@
     <title>{{ config('app.name') }}</title>
     <link href="{{ mix('css/invitado.css')}}" rel="stylesheet">
 </head>
-<body class="landing-page">
+<body class="@yield('body')">
     @yield('cuerpo')
-    <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXphG-N8S7KAOCbfRGPeogIq07yYZCazo"></script>-->
     <script src="{{ mix('js/invitado.vendor.js')}}"></script>
     <script src="{{ mix('js/invitado.js')}}"></script>
 </body>

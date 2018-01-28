@@ -19,14 +19,16 @@ class RedirectIfAuthenticated
         if(Auth::guard($guard)->check()){
             switch ($guard){
                 case    'adm':
-                    return redirect(route("comun.login"));
+                    return redirect(route("adm.inicio"));
+                    break;
+                case    'cli':
+                    return redirect(route("cli.inicio"));
                     break;
                 default      :
                     return redirect(route("comun.login"));
                     break;
             }
         }
-
         return $next($request);
     }
 }

@@ -1,4 +1,5 @@
 @extends('landing.base')
+@section('body','landing-page')
 @section('cuerpo')
     <nav class="navbar navbar-transparent navbar-absolute">
         <div class="container">
