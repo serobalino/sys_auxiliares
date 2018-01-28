@@ -12,9 +12,7 @@
 */
 
 
-Route::get('/', function () {
-    return view('landing.index');
-});
+Route::get('/', 'LandingController@index');
 
 Route::post('facturas', 'ArchivosController@subirArchivos');
 Route::get('facturas', 'ArchivosController@indexArchivos');

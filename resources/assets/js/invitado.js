@@ -15,7 +15,7 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-//Vue.component('example-component', require('./components/invitado/ExampleComponent.vue'));
+Vue.component('enviar-email', require('./componentes/invitado/enviarEmail'));
 
 const invitado = new Vue({
     el: '#invitado'

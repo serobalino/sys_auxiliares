@@ -35,7 +35,8 @@ mix //dependencias de usuario
             'resources/assets/invitado/js/material.min.js',
             'resources/assets/invitado/js/nouislider.min.js',
             'resources/assets/invitado/js/bootstrap-datepicker.js',
-            'resources/assets/invitado/js/material-kit.js'
+            'resources/assets/invitado/js/material-kit.js',
+            'node_modules/wowjs/dist/wow.min.js'
         ],  'public/js/invitado.vendor.js')
     .js('resources/assets/js/invitado.js', 'public/js')
     .sass('resources/assets/sass/invitado.scss', 'public/css')

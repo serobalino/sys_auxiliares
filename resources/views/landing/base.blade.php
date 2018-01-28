@@ -11,26 +11,15 @@
     <meta property="og:type"               content="article" />
     <meta property="og:title"              content="ASECONT - PUYO | Asesoría Contable Tributaria" />
     <meta property="og:description"        content="ASECONT - PUYO" />
-    <meta property="og:image"              content="img/logos/asecont_logo.png" />
+    <meta property="og:image"              content="{{asset('img/asecont_logo.png',true)}}" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name') }}</title>
-    <link href="{{ asset('/lib/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('/lib/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('/lib/animate/animate.min.css')}}" rel="stylesheet" type="text/css">
-    <link href="{{ asset('/css/asecont.css')}}" rel="stylesheet">
+    <link href="{{ mix('css/invitado.css')}}" rel="stylesheet">
 </head>
-<body>
+<body class="landing-page">
     @yield('cuerpo')
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXphG-N8S7KAOCbfRGPeogIq07yYZCazo"></script>
-    <script src="{{ asset('/lib/jquery/jquery.min.js')}}"></script>
-    <script src="{{ asset('/lib/tether/tether.min.js')}}"></script>
-    <script src="{{ asset('/lib/bootstrap/js/bootstrap.min.js')}}"></script>
-    <script src="{{ asset('/lib/jquery/jquery-easing.js')}}"></script>
-    <script src="{{ asset('/lib/jquery/wow.min.js')}}"></script>
-    <script src="{{ asset('/js/validation.js')}}"></script>
-    <script src="{{ asset('/js/contactos.js')}}"></script>
-    <script src="{{ asset('/js/asecont.min.js')}}"></script>
-    <script>
-        new WOW().init();
-    </script>
+    <script src="{{ mix('js/invitado.vendor.js')}}"></script>
+    <script src="{{ mix('js/invitado.js')}}"></script>
 </body>
 </html>
