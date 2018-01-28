@@ -18,7 +18,7 @@
 </head>
 <body class="landing-page">
     @yield('cuerpo')
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXphG-N8S7KAOCbfRGPeogIq07yYZCazo"></script>
+    <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXphG-N8S7KAOCbfRGPeogIq07yYZCazo"></script>-->
     <script src="{{ mix('js/invitado.vendor.js')}}"></script>
     <script src="{{ mix('js/invitado.js')}}"></script>
 </body>

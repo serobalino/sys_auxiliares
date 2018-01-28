@@ -208,6 +208,7 @@
                 </div>
                 <enviar-email></enviar-email>
             </div>
+            <mapa></mapa>
         </div>
         <footer class="footer">
             <div class="container">
@@ -235,6 +236,5 @@
                 </div>
             </div>
         </footer>
-
     </div>
 @endsection

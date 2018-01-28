@@ -16,7 +16,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('enviar-email', require('./componentes/invitado/enviarEmail'));
-
+Vue.component('mapa', require('./componentes/invitado/direccionMapa'));
 const invitado = new Vue({
     el: '#invitado'
 });

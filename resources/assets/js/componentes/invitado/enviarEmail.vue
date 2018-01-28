@@ -75,7 +75,6 @@
                     nombre:this.nombre,
                     mensaje:this.mensaje,
                 }).then((response) => {
-                    console.log(response.data)
                     this.enviado=response.data.val;
                     this.procesado=false;
                 }).catch((error) => {
@@ -85,7 +84,6 @@
             verificar:function(){
                 this.procesado=true;
                 axios.options('/').then((response) => {
-                    console.log(response.data);
                     this.enviado=response.data.val;
                     this.procesado=false;
                 }).catch((error) => {
