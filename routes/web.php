@@ -59,7 +59,7 @@ Route::group(['middleware' => 'auth:adm'], function () {
         Route::get('/administrador/clientes/{ruc}/gastos/clasificar/excel','ComprobarComprobantesController@generar_excel')->name('adm.cli.aux.excel');
     });
     Route::get('/administrador/clientes', function () {
-        return view('basico.listaClientes');
+        return view('administrador.listaClientes');
     })->name('adm.inicio');
 
     $suffix="apiadm";

@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse" id="navigation-example">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="{{route('comun.login')}}" target="_blank">
+                        <a href="{{route('comun.login')}}" >
                             <i class="material-icons">fingerprint</i> Ingresar
                         </a>
                     </li>
