@@ -11,8 +11,10 @@
 |
 */
 
-
+///landing page
 Route::get('/', 'LandingController@index');
+Route::post('/', 'LandingController@enviarMail');
+Route::options('/', 'LandingController@verificar');
 
 Route::post('facturas', 'ArchivosController@subirArchivos');
 Route::get('facturas', 'ArchivosController@indexArchivos');

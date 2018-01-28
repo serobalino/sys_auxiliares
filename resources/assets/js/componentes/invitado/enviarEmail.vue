@@ -6,7 +6,7 @@
                     <div class="col-md-8 col-md-offset-2">
                         <h2 class="text-center title">Contáctanos</h2>
                         <h4 class="text-center description">Necesitas más información?<br>Envíanos tu inquietud y gustosos te ayudaremos</h4>
-                        <form class="contact-form">
+                        <form class="contact-form" v-on:submit.prevent="enviar">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group label-floating">
@@ -41,7 +41,7 @@
             <div class="card card-nav-tabs animated fadeIn" v-else>
                 <div class="content">
                     <div class="tab-content text-center">
-                        <h2 class="text-success">Se ha enviado su mensaje</h2>
+                        <h2 class="text-success"><span class="fa fa-envelope-o"></span> Se ha enviado su mensaje</h2>
                     </div>
                 </div>
             </div>
@@ -70,14 +70,12 @@
         methods:{
             enviar:function(){
                 this.procesado=true;
-                axios({
-                    method: 'POST',
-                    params:{
-                        correo:this.correo,
-                        nombre:this.nombre,
-                        mensaje:this.mensaje,
-                    },
+                axios.post('/',{
+                    correo:this.correo,
+                    nombre:this.nombre,
+                    mensaje:this.mensaje,
                 }).then((response) => {
+                    console.log(response.data)
                     this.enviado=response.data.val;
                     this.procesado=false;
                 }).catch((error) => {
@@ -86,16 +84,14 @@
             },
             verificar:function(){
                 this.procesado=true;
-                axios({
-                    method: 'OPTIONS',
-                }).then((response) => {
+                axios.options('/').then((response) => {
+                    console.log(response.data);
                     this.enviado=response.data.val;
                     this.procesado=false;
                 }).catch((error) => {
                     this.procesado=true;
                 });
             }
-
         },
         mounted(){
             new WOW().init();
