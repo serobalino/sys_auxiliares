@@ -24,8 +24,9 @@ mix //dependencias de usuario
             'node_modules/bootstrap-notify/bootstrap-notify.min.js',
             'resources/assets/usuario/js/material-dashboard.js'
         ],  'public/js/usuario.vendor.js')
-    .js('resources/assets/js/usuario.js', 'public/js')
     .sass('resources/assets/sass/usuario.scss', 'public/css')
+    ///ADminsitrador
+    .js('resources/assets/js/administrador.js', 'public/js')
     //dependecias de invitado
     .copyDirectory('resources/assets/invitado/img','public/img')
     .scripts(

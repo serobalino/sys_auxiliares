@@ -1,6 +1,6 @@
 {
     "/js/invitado.js": "/js/invitado.js",
-    "/js/usuario.js": "/js/usuario.js",
+    "/js/administrador.js": "/js/administrador.js",
     "/css/usuario.css": "/css/usuario.css",
     "/css/invitado.css": "/css/invitado.css",
     "/js/usuario.vendor.js": "/js/usuario.vendor.js",

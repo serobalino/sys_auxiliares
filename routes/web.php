@@ -12,7 +12,7 @@
 */
 
 ///landing page
-Route::get('/', 'LandingController@index');
+Route::get('/', 'LandingController@index')->name('index');
 Route::post('/', 'LandingController@enviarMail');
 Route::options('/', 'LandingController@verificar');
 
@@ -21,7 +21,7 @@ Route::get('facturas', 'ArchivosController@indexArchivos');
 
 
 /*Login comun para todos*/
-Route::get('/ingresar', 'Auth\AutenticacionController@showLoginForm')->name('comun.login');
+Route::get('/ingresar', 'Auth\AutenticacionController@showLoginForm')->name('login');
 Route::post('/ingresar', 'Auth\AutenticacionController@login')->name('comun.login.submit');
 Route::delete('/salir','Auth\AutenticacionController@logout')->name('logout');
 

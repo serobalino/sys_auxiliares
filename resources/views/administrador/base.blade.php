@@ -13,6 +13,6 @@
 <body class="@yield('body')">
     @yield('cuerpo')
     <script src="{{ mix('js/usuario.vendor.js')}}"></script>
-    <script src="{{ mix('js/usuario.js')}}"></script>
+    <script src="{{ mix('js/administrador.js')}}"></script>
 </body>
 </html>
