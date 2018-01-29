@@ -1,8 +1,8 @@
 {
-    "/js/invitado.js": "/js/invitado.js",
     "/js/administrador.js": "/js/administrador.js",
     "/css/usuario.css": "/css/usuario.css",
     "/css/invitado.css": "/css/invitado.css",
+    "/js/invitado.js": "/js/invitado.js",
     "/js/usuario.vendor.js": "/js/usuario.vendor.js",
     "/js/invitado.vendor.js": "/js/invitado.vendor.js"
 }

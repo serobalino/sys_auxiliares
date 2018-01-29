@@ -520,7 +520,17 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <tabla-clientes></tabla-clientes>
+                        <div class="card">
+                            <div class="card-header" data-background-color="blue">
+                                <h4 class="title">Clientes Registrados</h4>
+                                <div class="category">
+                                    Para agregar un nuevo cliente <button class="btn btn-primary btn-sm"><span class="fa fa-plus"></span> Agregar</button>
+                                </div>
+                            </div>
+                            <div class="card-content table-responsive">
+                                <tabla-clientes></tabla-clientes>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

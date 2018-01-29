@@ -1,18 +1,17 @@
 <template>
-    <div>
         <vue-good-table
-                title="Demo Table"
                 :columns="columns"
                 :rows="rows"
                 :paginate="true"
-                :lineNumbers="true"/>
-    </div>
+                :lineNumbers="true"
+        />
 </template>
 <script>
     import VueGoodTable from 'vue-good-table';
     Vue.use(VueGoodTable);
     export default {
         name: "tabla-clientes",
+
         data:()=>({
             columns: [
                 {
@@ -62,11 +61,7 @@
             ]
         }),
         mounted(){
-            console.log('Se envio');
+
         }
     }
 </script>
-
-<style scoped>
-
-</style>
