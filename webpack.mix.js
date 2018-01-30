@@ -21,7 +21,8 @@ mix //dependencias de usuario
             'node_modules/chartist/dist/chartist.min.js',
             'node_modules/arrive/minified/arrive.min.js',
             'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js',
-            'node_modules/bootstrap-notify/bootstrap-notify.min.js',
+            //'node_modules/bootstrap-notify/bootstrap-notify.min.js',
+            'resources/assets/usuario/js/bootstrap-notify.js',
             'resources/assets/usuario/js/material-dashboard.js'
         ],  'public/js/usuario.vendor.js')
     .sass('resources/assets/sass/usuario.scss', 'public/css')

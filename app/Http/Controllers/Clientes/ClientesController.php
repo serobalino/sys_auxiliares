@@ -48,23 +48,19 @@ class ClientesController extends Controller
                 $ruc_cl->num_dc     =   $cliente->ruc_cl;
                 $ruc_cl->save();
 
-                return (['return'=>true,'mensaje'=>'Se guardo con exito '.$request->rsocial]);
+                return (['val'=>true,'mensaje'=>'Se guardo con exito '.$request->rsocial]);
             }else{
-                return (['return'=>false,'mensaje'=>'Ya existe un cliente con ese ruc']);
+                return (['val'=>false,'mensaje'=>'Ya existe un cliente con ese ruc']);
             }
         }
     }
     public function show($id){
-        if ($id<0) {
-            return (['return'=>false,'mensaje'=>'Id icorrecta']);
+        $comprobar = Cliente::findOrFail($id);
+        if($comprobar){
+            session(['cliente' => $comprobar]);
+            return (['val'=>true,'ruta'=>route('adm.cli.ruc',$comprobar->ruc_cl)]);
         }else{
-            $comprobar = Cliente::find($id);
-            if(count($comprobar)>0){
-                session(['cliente' => $comprobar]);
-                return (['return'=>true,'ruta'=>URL::route('adm.cli.ruc',$comprobar->ruc_cl)]);
-            }else{
-                return (['return'=>false,'mensaje'=>'No existe ese cliente']);
-            }
+            return (['val'=>false,'mensaje'=>'No existe ese cliente']);
         }
     }
     public function ver($ruc){

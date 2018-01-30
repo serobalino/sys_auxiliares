@@ -16,6 +16,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('tabla-clientes', require('./componentes/administrador/tablaClientes'));
+Vue.component('modal-registro', require('./componentes/administrador/modalRegistro'));
 const administrador = new Vue({
     el: '#adm'
 });
