@@ -63,9 +63,34 @@
                                     align: 'right'
                                 }
                             });
+                            location.replace(response.data.ruta);
+                        }else{
+                            $.notify({
+                                icon: "error",
+                                message: "Ha ocurrido un error vuelva a intentar."
+
+                            }, {
+                                type: 'danger',
+                                timer: 3000,
+                                placement: {
+                                    from: 'bottom',
+                                    align: 'right'
+                                }
+                            });
                         }
                     }).catch((error) => {
-                    console.error(error)
+                    $.notify({
+                        icon: "error",
+                        message: "Ha ocurrido un error vuelva a intentar."
+
+                    }, {
+                        type: 'danger',
+                        timer: 3000,
+                        placement: {
+                            from: 'bottom',
+                            align: 'right'
+                        }
+                    });
                 });
 
                 console.log({row,index});

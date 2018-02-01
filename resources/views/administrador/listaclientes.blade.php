@@ -51,17 +51,12 @@
                                 </li>
                             </ul>
                         </li>
-                        <li>
-                            <a href="#pablo" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="material-icons">person</i>
-                                <p class="hidden-lg hidden-md">Perfil</p>
-                            </a>
-                        </li>
+                        <avatar-session url="{{route('session.adm')}}"/>
                     </ul>
                 </div>
             </div>
         </nav>
-        <div class="content" id="adm">
+        <div class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12">
@@ -79,8 +74,9 @@
                     </div>
                 </div>
             </div>
-            <modal-registro/>
         </div>
+        <modal-registro/>
+        <modalsesion url="{{route('session.adm')}}"/>
         <footer class="footer">
             <div class="container-fluid">
                 <p class="copyright pull-right">

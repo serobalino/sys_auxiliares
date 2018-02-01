@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 
@@ -66,5 +67,12 @@ class ConfiguracionController extends Controller
         ];
 
         return($servicios);
+    }
+
+    public function sessionApi(){
+
+        $a['logout']    =   route('logout');
+        $a['user']      =   Auth::guard('adm')->user();
+        return $a;
     }
 }

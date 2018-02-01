@@ -11,7 +11,9 @@
     <link href="{{ mix('css/usuario.css')}}" rel="stylesheet">
 </head>
 <body class="@yield('body')">
+<div id="adm">
     @yield('cuerpo')
+</div>
     <script src="{{ mix('js/usuario.vendor.js')}}"></script>
     <script src="{{ mix('js/administrador.js')}}"></script>
 </body>

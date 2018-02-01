@@ -31,9 +31,9 @@ class AutenticacionController extends Controller{
                 return (['val'=>false]);
         }
     }
-    public function logout(Request $request){
+    public function logout(){
         Auth::guard('adm')->logout();
         Auth::guard('cli')->logout();
-        return redirect('/');
+        return (['val'=>true,'ruta'=>route('login')]);
     }
 }

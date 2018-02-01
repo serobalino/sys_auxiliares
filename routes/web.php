@@ -31,6 +31,7 @@ Route::get('administradores','Auth\AutenticacionAdministradoresController@showLo
 //Route::get('/adm','AdministradoresController@index')->name('adm.inicio');
 
 Route::group(['middleware' => 'auth:adm'], function () {
+
     Route::group(['middleware' => 'selecCliente'], function () {
         Route::get('/administrador/clientes/{ruc}', 'Clientes\ClientesController@ver')->name('adm.cli.ruc');
         Route::get('/administrador/clientes/{ruc}/gastos/electronicas', 'Clientes\ClientesController@electronicas')->name('adm.cli.sub.ele');
@@ -62,9 +63,12 @@ Route::group(['middleware' => 'auth:adm'], function () {
         return view('administrador.listaClientes');
     })->name('adm.inicio');
 
-    $suffix="apiadm";
-    Route::resource("$suffix/clientes",'Clientes\ClientesController',['only'=>['index','store','show']]);
-    Route::resource("$suffix/gastos/subir",'Electronicas\SubirController',['only'=>['index','store','show']]);
+    //api admin
+    Route::prefix('apiadm')->group(function () {
+        Route::resource("/clientes",'Clientes\ClientesController',['only'=>['index','store','show']]);
+        Route::resource("/gastos/subir",'Electronicas\SubirController',['only'=>['index','store','show']]);
+        Route::get("/informacion",'ConfiguracionController@sessionApi')->name('session.adm');
+    });
 });
 
 

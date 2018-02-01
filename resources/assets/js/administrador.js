@@ -9,6 +9,8 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+moment.locale('es');
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -17,6 +19,14 @@ window.Vue = require('vue');
 
 Vue.component('tabla-clientes', require('./componentes/administrador/tablaClientes'));
 Vue.component('modal-registro', require('./componentes/administrador/modalRegistro'));
+Vue.component('avatar-session', require('./componentes/administrador/session'));
+
+Vue.component('noticias', require('./componentes/administrador/perfil/noticias'));
+Vue.component('pie',require('./componentes/administrador/pie'))
+
+Vue.component('modalsesion', require('./componentes/administrador/perfil/modalSesion'));
+Vue.component('principal', require('./componentes/administrador/perfil/principal'));
+
 const administrador = new Vue({
     el: '#adm'
 });

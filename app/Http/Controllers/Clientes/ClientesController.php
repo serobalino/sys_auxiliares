@@ -65,7 +65,7 @@ class ClientesController extends Controller
     }
     public function ver($ruc){
         $a  =   session()->get('cliente');
-        return view('basico.perfilCliente',$a);
+        return view('administrador.perfil.inicio',$a);
     }
     public function electronicas($ruc){
         $a  =   session()->get('cliente');

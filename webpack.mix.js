@@ -21,6 +21,10 @@ mix //dependencias de usuario
             'node_modules/chartist/dist/chartist.min.js',
             'node_modules/arrive/minified/arrive.min.js',
             'node_modules/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js',
+            'node_modules/moment/moment.js',
+            'node_modules/moment/locale/es.js',
+            'node_modules/jquery-validation/dist/jquery.validate.js',
+            'node_modules/jquery-validation/localization/messages_es.js',
             'resources/assets/usuario/js/bootstrap-notify.js',
             'resources/assets/usuario/js/material-dashboard.js'
         ],  'public/js/usuario.vendor.js')
