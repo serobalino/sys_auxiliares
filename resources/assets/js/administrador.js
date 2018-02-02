@@ -17,6 +17,8 @@ moment.locale('es');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+export let componentes = new Vue();
+
 Vue.component('tabla-clientes', require('./componentes/administrador/tablaClientes'));
 Vue.component('modal-registro', require('./componentes/administrador/modalRegistro'));
 Vue.component('avatar-session', require('./componentes/administrador/session'));

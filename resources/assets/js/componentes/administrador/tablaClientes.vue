@@ -8,6 +8,7 @@
         />
 </template>
 <script>
+    import {componentes} from '../../administrador.js';
     import VueGoodTable from 'vue-good-table';
     Vue.use(VueGoodTable);
     export default {
@@ -98,6 +99,9 @@
         },
         mounted(){
             this.cargar();
+            componentes.$on('actualizar-tabla',function(){
+                this.cargar();
+            }.bind(this));
         }
     }
 </script>

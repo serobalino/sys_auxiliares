@@ -14,7 +14,7 @@
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true"><i class="material-icons">clear</i></span>
                         </button>
-                        <b>Info alert:</b> You've got some friends nearby, stop looking at your phone and find them...
+                        Ingrese la información del Contribuyente.
                     </div>
                     <div class="alert alert-success">
                         <div class="alert-icon">
@@ -66,16 +66,24 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-primary" v-on:click="actualizarLista">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+    import {componentes} from '../../administrador.js';
     export default {
-        name: "modal-registro"
-
+        name: "modal-registro",
+        data:()=>({
+            datos:[],
+        }),
+        methods:{
+            actualizarLista:function(){
+                componentes.$emit('actualizar-tabla');
+            }
+        }
     }
 </script>
 
