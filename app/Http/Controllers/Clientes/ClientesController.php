@@ -32,8 +32,8 @@ class ClientesController extends Controller
         if ($validator->fails()) {
             return (['return'=>false,'mensaje'=>'Falta un campo']);
         }else{
-            $comprobar = Cliente::where('ruc_cl',$request->ruc)->get();
-            if(count($comprobar)<=0){
+            $validar =  app('App\Http\Controllers\PerfilCliente\DocumentosController')->verificar($request->ruc);
+            if($validar['val']){
                 $cliente    =   new Cliente();//guarda el cliente
                 $cliente->ruc_cl        =   $request->ruc;
                 $cliente->nombres_cl    =   $request->nombres;
@@ -41,6 +41,7 @@ class ClientesController extends Controller
                 $cliente->razon_cl      =   $request->rsocial;
                 $cliente->id_es         =   1;
                 $cliente->save();
+
 
                 $ruc_cl             =   new doc_cliente();//guarda su ruc en el registro de documentos
                 $ruc_cl->codigo_td  =   4;
@@ -50,7 +51,7 @@ class ClientesController extends Controller
 
                 return (['val'=>true,'mensaje'=>'Se guardo con exito '.$request->rsocial]);
             }else{
-                return (['val'=>false,'mensaje'=>'Ya existe un cliente con ese ruc']);
+                return ($validar);
             }
         }
     }

@@ -24,6 +24,7 @@ mix //dependencias de usuario
             'node_modules/moment/moment.js',
             'node_modules/moment/locale/es.js',
             'node_modules/jquery-validation/dist/jquery.validate.js',
+            'node_modules/jquery-validation/dist/additional-methods.js',
             'node_modules/jquery-validation/localization/messages_es.js',
             'resources/assets/usuario/js/bootstrap-notify.js',
             'resources/assets/usuario/js/material-dashboard.js'

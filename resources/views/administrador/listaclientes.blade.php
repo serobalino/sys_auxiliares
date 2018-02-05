@@ -75,7 +75,7 @@
                 </div>
             </div>
         </div>
-        <modal-registro/>
+        <modal-registro url="{{route('clientes.store')}}"/>
         <modalsesion url="{{route('session.adm')}}"/>
         <footer class="footer">
             <div class="container-fluid">

@@ -36,4 +36,18 @@ class DocumentosController extends Controller{
         $nuevo->save();
         return redirect(route('adm.cli.per.doc',$a->ruc_cl));
     }
+
+    public function verificar($ruc){
+        $validar    =   doc_cliente::where('num_doc',$ruc)->first();
+        if($validar){
+            return ([
+                'val'       =>  false,
+                'mensaje'   =>  'Ya existe un contribuyente con este RUC ',$validar->es->razon_cl
+            ]);
+        }else{
+            return ([
+                'val'       =>  true
+            ]);
+        }
+    }
 }
