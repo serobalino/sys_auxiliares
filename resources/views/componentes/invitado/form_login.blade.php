@@ -4,30 +4,35 @@
             Ingresar
         </h3>
     </div>
-    <form class="m-login__form m-form" action="">
+    <form class="m-login__form m-form" action="{{ route('login') }}" method="post">
+        @csrf
         <div class="form-group m-form__group">
-            <input class="form-control m-input" type="text" placeholder="Email" name="email" autocomplete="off">
+            <input class="form-control m-input" type="email" placeholder="Email" name="email" autocomplete="off" required value="{{ old('email') }}" autofocus>
+            @if ($errors->has('email'))
+                <div class="form-control-feedback text-danger">
+                    {{ $errors->first('email') }}
+                </div>
+            @endif
         </div>
         <div class="form-group m-form__group">
-            <input class="form-control m-input m-login__form-input--last" type="password" placeholder="Password" name="password">
+            <input class="form-control m-input m-login__form-input--last" type="password" placeholder="Contraseña" name="password" required>
+            @if ($errors->has('password'))
+                <div class="form-control-feedback">
+                    {{ $errors->first('password') }}
+                </div>
+            @endif
         </div>
+        <input type="hidden" name="remember" value="true">
         <div class="row m-login__form-sub">
-            <div class="col m--align-left m-login__form-left">
-                <label class="m-checkbox  m-checkbox--light">
-                    <input type="checkbox" name="remember">
-                    Remember me
-                    <span></span>
-                </label>
-            </div>
             <div class="col m--align-right m-login__form-right">
-                <a href="javascript:;" id="m_login_forget_password" class="m-link">
-                    Forget Password ?
+                <a href="{{route('password.request')}}" class="m-link">
+                    Olvidó su contraseña?
                 </a>
             </div>
         </div>
         <div class="m-login__form-action">
-            <button id="m_login_signin_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn">
-                Sign In
+            <button class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn" type="submit">
+                Iniciar sesión
             </button>
         </div>
     </form>

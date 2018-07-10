@@ -1,9 +1,7 @@
 <div class="m-login__account">
-							<span class="m-login__account-msg">
-								Don't have an account yet ?
-							</span>
+    <span class="m-login__account-msg">No tiene una cuenta?</span>
     &nbsp;&nbsp;
-    <a href="javascript:;" id="m_login_signup" class="m-link m-link--light m-login__account-link">
-        Sign Up
+    <a href="{{route('register')}}" class="m-link m-link--light m-login__account-link">
+        Registrese
     </a>
 </div>

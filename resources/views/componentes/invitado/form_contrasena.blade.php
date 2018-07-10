@@ -1,4 +1,4 @@
-<div class="m-login__forget-password">
+<div class="m-login__forget-password show">
     <div class="m-login__head">
         <h3 class="m-login__title">
             Forgotten Password ?
