@@ -9,7 +9,9 @@
     <link href="{{mix('css/invitado.css')}}" rel="stylesheet" type="text/css">
 </head>
 <body class="m--skin- m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-dark m-aside-left--offcanvas m-footer--push m-aside--offcanvas-default">
-@yield('cuerpo')
+<div id="invitado">
+    @yield('cuerpo')
+</div>
 <script src="{{mix('js/asecont.vendor.js')}}" type="text/javascript"></script>
 <script src="{{mix('js/invitado.js')}}" type="text/javascript"></script>
 </body>
