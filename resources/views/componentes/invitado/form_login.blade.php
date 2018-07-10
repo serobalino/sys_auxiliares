@@ -1,12 +1,12 @@
 <div class="m-login__signin">
     <div class="m-login__head">
         <h3 class="m-login__title">
-            Sign In To Admin
+            Ingresar
         </h3>
     </div>
     <form class="m-login__form m-form" action="">
         <div class="form-group m-form__group">
-            <input class="form-control m-input"   type="text" placeholder="Email" name="email" autocomplete="off">
+            <input class="form-control m-input" type="text" placeholder="Email" name="email" autocomplete="off">
         </div>
         <div class="form-group m-form__group">
             <input class="form-control m-input m-login__form-input--last" type="password" placeholder="Password" name="password">
