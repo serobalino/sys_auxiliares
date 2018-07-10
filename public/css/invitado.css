@@ -72266,5 +72266,41 @@ body.m-content--skin-light2 {
   clip: auto;
 }
 
+#invitado {
+  background: -webkit-gradient(linear, right top, left top, from(#4d3890), to(#7c3232));
+  background: linear-gradient(270deg, #4d3890, #7c3232);
+  background-size: 400% 400%;
+  -webkit-animation: AnimationName 30s ease infinite;
+  animation: AnimationName 30s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes AnimationName {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 
 /*# sourceMappingURL=invitado.css.map*/
