@@ -72266,7 +72266,7 @@ body.m-content--skin-light2 {
   clip: auto;
 }
 
-#invitado {
+#no {
   background: -webkit-gradient(linear, right top, left top, from(#4d3890), to(#7c3232));
   background: linear-gradient(270deg, #4d3890, #7c3232);
   background-size: 400% 400%;
