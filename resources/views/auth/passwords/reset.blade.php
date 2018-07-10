@@ -7,7 +7,8 @@
                 <div class="m-login__container">
                     @component('componentes.invitado.logo')
                     @endcomponent
-                    @component('componentes.invitado.form_contrasena')
+                    @component('componentes.invitado.form_cambiar')
+                            @slot('token',$token)
                     @endcomponent
                     @component('componentes.invitado.pie')
                     @endcomponent

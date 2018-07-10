@@ -1,6 +1,6 @@
-@extends('layouts.app')
+@extends('plantillas.usuario')
 
-@section('content')
+@section('cuerpo')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">

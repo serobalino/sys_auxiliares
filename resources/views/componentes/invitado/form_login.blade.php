@@ -1,8 +1,6 @@
 <div class="m-login__signin">
     <div class="m-login__head">
-        <h3 class="m-login__title">
-            Ingresar
-        </h3>
+        <h3 class="m-login__title">Ingresar</h3>
     </div>
     <form class="m-login__form m-form" action="{{ route('login') }}" method="post">
         @csrf

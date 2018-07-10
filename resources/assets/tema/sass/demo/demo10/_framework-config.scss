@@ -21,8 +21,8 @@ $m--root-font: (
 */
 
 //== Brand Color
-$m--brand-color: #4a40e0;
-$m--brand-inverse-color: #ffffff;  
+$m--brand-color: $primero;
+$m--brand-inverse-color: $inverso;
 
 //== General box shadows
 $m--box-shadow-base-color: darken(#c5c2cc, 45%);
