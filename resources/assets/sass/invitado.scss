@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Asap+Condensed|Poppins|Roboto');
+
+// Variables
+@import "variables";
+
+@import "../tema/sass/demo/default/style";
+
+//metronic
+@import "../tema/src/vendors/metronic/css/styles.css";
+@import "../tema/assets/vendors/base/vendors.bundle.css";
+
+//iconos
+@import "~font-awesome/scss/font-awesome";
+@import "../tema/src/vendors/flaticon/css/flaticon.css";
+@import "../tema/src/vendors/line-awesome/css/line-awesome.css";

@@ -1,0 +1,29 @@
+//
+//** Override The Base Framework Config For This Demo
+//
+
+//== Example(reduce font size from 14px to 13px globally for desktop mode only)
+
+//== The body element font settings
+/**
+$m--root-font: (
+    size: (
+        desktop: 13px,
+        tablet: 13px,
+        mobile: 13px
+    ), 
+    weight: 300, 
+    color: (
+        light: #333333, 
+        dark: #efefef
+    )
+);
+*/
+
+//== Brand Color
+$m--brand-color: #3dc1d8;
+$m--brand-inverse-color: #ffffff;
+$secundario:#f89c2d;
+
+//== General box shadows
+$m--box-shadow-base-color: darken(#4E5A72, 45%);
