@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     08/02/2019 13:22:14                          */
+/* Created on:     08/02/2019 13:57:39                          */
 /*==============================================================*/
 
 
@@ -144,11 +144,11 @@ create table users
    name                 varchar(300),
    password             char(61),
    remember_token       varchar(100),
-   admin                bool default 0,
+   admin                boolean default 0,
    email                varchar(300),
    created_at           datetime default current_timestamp,
    updated_at           timestamp,
-   email_verified_at    timestamp default null,
+   email_verified_at    datetime default null,
    primary key (id)
 );
 
