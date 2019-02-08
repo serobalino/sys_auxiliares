@@ -2746,12 +2746,14 @@ DAT 1531200643</a:History>
 <a:Code>TITULO_TD</a:Code>
 <a:CreationDate>1531200643</a:CreationDate>
 <a:Creator>SebastiaN</a:Creator>
-<a:ModificationDate>1531200643</a:ModificationDate>
+<a:ModificationDate>1549660116</a:ModificationDate>
 <a:Modifier>SebastiaN</a:Modifier>
 <a:History>ORG {FE88D8CD-1A2A-4F61-8857-403AD494EC7B}
-DAT 1531200643</a:History>
-<a:DataType>VA20</a:DataType>
-<a:Length>20</a:Length>
+DAT 1531200643
+ATT DTTP
+ATT MLEN</a:History>
+<a:DataType>VA30</a:DataType>
+<a:Length>30</a:Length>
 <a:LogicalAttribute.Mandatory>1</a:LogicalAttribute.Mandatory>
 </o:EntityAttribute>
 </c:Attributes>
@@ -3301,12 +3303,12 @@ DAT 1531200643</a:History>
 <a:Code>PDM</a:Code>
 <a:CreationDate>1549649872</a:CreationDate>
 <a:Creator>SebastiaN</a:Creator>
-<a:ModificationDate>1549650109</a:ModificationDate>
+<a:ModificationDate>1549662487</a:ModificationDate>
 <a:Modifier>SebastiaN</a:Modifier>
 <a:TargetModelURL>file:///%[PRJ_ROOT_DIR]%/PDM.pdm</a:TargetModelURL>
 <a:TargetModelID>66B2613F-844C-46CF-B1F0-DFAC5374FEAF</a:TargetModelID>
 <a:TargetModelClassID>CDE44E21-9669-11D1-9914-006097355D9B</a:TargetModelClassID>
-<a:TargetModelLastModificationDate>1549649873</a:TargetModelLastModificationDate>
+<a:TargetModelLastModificationDate>1549662488</a:TargetModelLastModificationDate>
 <c:SessionShortcuts>
 <o:Shortcut Ref="o4"/>
 </c:SessionShortcuts>

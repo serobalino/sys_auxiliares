@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     08/02/2019 13:57:39                          */
+/* Created on:     08/02/2019 16:48:17                          */
 /*==============================================================*/
 
 
@@ -131,7 +131,7 @@ create table tipo_contrasena
 create table tipo_documentos
 (
    codigo_td            int not null,
-   titulo_td            varchar(20) not null,
+   titulo_td            varchar(30) not null,
    primary key (codigo_td)
 );
 
