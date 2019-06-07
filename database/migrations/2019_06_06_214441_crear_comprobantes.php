@@ -19,7 +19,7 @@ class CrearComprobantes extends Migration
             $table->unsignedInteger('id_tc');
             $table->date('fecha_co');
             $table->boolean('estado_co')->default(false);
-            $table->json('comprobante')->nullable();
+            $table->longText('comprobante')->nullable();
             $table->timestamps();
 
             $table->foreign('id_cl')->references('id_cl')->on('clientes');

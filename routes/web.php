@@ -41,4 +41,8 @@ Auth::routes(['verify' => true]);
 
 Route::middleware('verified')->group(function () {
     Route::get('/home', 'HomeController@index')->name('home');
+
+    Route::prefix('app')->group(function () {
+        Route::resource("clientes","ClientesController");
+    });
 });
