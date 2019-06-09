@@ -19,8 +19,14 @@
                             size="sm"
                     ></b-form-input>
                 </b-form-group>
-                <b-list-group>
-                    <b-list-group-item v-for="item in filtrar" :key="item.id_cl">{{item.apellidos_cl+" "+item.nombres_cl}}</b-list-group-item>
+                <b-list-group flush>
+                    <b-list-group-item
+                            :href="'#'+item.dni_cl"
+                            v-for="item in filtrar"
+                            :key="item.id_cl"
+                            :active="item.id_cl===picker.id_cl"
+                            v-on:click="seleccionar(item)"
+                    >{{item.apellidos_cl+" "+item.nombres_cl}}</b-list-group-item>
                 </b-list-group>
                 <div class="text-center" v-if="filtrar.length===0">
                     <p class="text-danger">No existen registros</p>
@@ -28,43 +34,61 @@
             </div>
         </div>
         <b-modal hide-footer centered id="nuevo" size="xl" title="Nuevo">
-            <div class="alert alert-primary" role="alert">
-                This is a primary alert—check it out!
+            <div class="alert alert-info" role="alert" v-if="estado.id===1">
+                <i class="fa fa-info-circle"></i> Ingrese la información del cliente
+            </div>
+            <div class="alert alert-warning" role="alert" v-if="estado.id===2">
+                <div class="spinner-border text-primary" role="status"></div> Procesando
+            </div>
+            <div class="alert alert-danger" role="alert" v-if="estado.id===3">
+                <i class="fa fa-stop"></i> {{estado.mensaje}}
+            </div>
+            <div class="alert alert-success" role="alert" v-if="estado.id===4">
+                <i class="fa fa-thumbs-up"></i> {{estado.mensaje}}
             </div>
             <form v-on:submit.prevent="validar">
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Nombres</label>
-                    <div class="col-sm-10">
-                        <input type="text" v-validate="'required'" name="nombres" v-model="formulario.nombres_cl" class="form-control" placeholder="Fany Loyola">
-                        <small class="text-danger">{{ errors.first('nombres') }}</small>
+                <fieldset :disabled="estado.disabled">
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Nombres</label>
+                        <div class="col-sm-10">
+                            <input type="text" v-validate="'required'" name="nombres" v-model="formulario.nombres" class="form-control" placeholder="Fany Loyola">
+                            <small class="text-danger">{{ errors.first('nombres') }}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Apellidos</label>
-                    <div class="col-sm-10">
-                        <input type="text" v-validate="'required'" name="apellidos" v-model="formulario.apellidos_cl" class="form-control" placeholder="Robalino Altamirano">
-                        <small class="text-danger">{{ errors.first('nombres') }}</small>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Apellidos</label>
+                        <div class="col-sm-10">
+                            <input type="text" v-validate="'required'" name="apellidos" v-model="formulario.apellidos" class="form-control" placeholder="Robalino Altamirano">
+                            <small class="text-danger">{{ errors.first('apellidos') }}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Razón Social</label>
-                    <div class="col-sm-10">
-                        <input type="text" v-validate="'required|min:13|max:13'" name="razón social" v-model="formulario.razon_cl" class="form-control" placeholder="ASECONT PUYO">
-                        <small class="text-danger">{{ errors.first('razón social') }}</small>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Razón Social</label>
+                        <div class="col-sm-10">
+                            <input type="text" v-validate="'required'" name="razón social" v-model="formulario.razon" class="form-control" placeholder="ASECONT PUYO">
+                            <small class="text-danger">{{ errors.first('razón social') }}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>RUC</label>
-                    <div class="col-sm-10">
-                        <input type="text" v-validate="'required'" name="ruc" v-model="formulario.dni_cl" class="form-control" placeholder="1600123456001">
-                        <small class="text-danger">{{ errors.first('ruc') }}</small>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>Cédula</label>
+                        <div class="col-sm-10">
+                            <input type="text" v-validate="'required|min:10|max:10'" name="cédula" v-model="formulario.dni" class="form-control" placeholder="1600123456">
+                            <small class="text-danger">{{ errors.first('cédula') }}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-10">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"><span class="text-danger">*</span>RUC</label>
+                        <div class="col-sm-10">
+                            <input type="text" v-validate="'required|min:13|max:13'" name="ruc" v-model="formulario.ruc" class="form-control" placeholder="1600123456001">
+                            <small class="text-danger">{{ errors.first('ruc') }}</small>
+                        </div>
                     </div>
-                </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Guardar</button>
+                        </div>
+                    </div>
+                </fieldset>
             </form>
         </b-modal>
     </div>
@@ -81,13 +105,22 @@
         name: "lista-clientes",
         data:()=>({
             lista:[],
+            picker:{
+                id_cl:null,
+            },
             cargando:true,
             buscar:null,
             formulario:{
-                apellidos_cl:null,
-                nombres_cl:null,
-                razon_cl:null,
-                dni_cl:null
+                apellidos:null,
+                nombres:null,
+                razon:null,
+                ruc:null,
+                dni:null
+            },
+            estado:{
+                id:1,
+                mensaje:"",
+                disabled:false
             }
         }),
         computed: {
@@ -101,6 +134,10 @@
             }
         },
         methods:{
+            seleccionar:function(item){
+                this.picker=item;
+                this.$emit('seleccionado',item);
+            },
             consultar:function(){
                 this.cargando=true;
                 servicios.clientes.index().then((response)=>{
@@ -111,9 +148,27 @@
             validar:function(){
                 this.$validator.validateAll().then((result) => {
                     if (result) {
-
+                        this.estado.id=2;
+                        this.estado.disabled=true;
+                        servicios.clientes.store(this.formulario).then((response)=>{
+                            this.estado.id=4;
+                            this.estado.mensaje=response.data.mensaje;
+                            this.estado.disabled=false;
+                            this.consultar();
+                            this.formulario={
+                                apellidos:null,
+                                nombres:null,
+                                razon:null,
+                                ruc:null,
+                                dni:null
+                            };
+                        }).catch((error)=>{
+                            this.estado.id=3;
+                            this.estado.disabled=false;
+                            this.estado.mensaje=error.response.data.message;
+                        });
                     } else {
-
+                        this.estado.id=1;
                     }
                 });
             }
