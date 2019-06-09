@@ -17,7 +17,8 @@ class CrearClientes extends Migration
             $table->increments('id_cl');
             $table->string('nombres_cl');
             $table->string('apellidos_cl');
-            $table->string('dni_cl',13);
+            $table->string('dni_cl',10);
+            $table->string('ruc_cl',13);
             $table->string('razon_cl');
             $table->timestamps();
         });
