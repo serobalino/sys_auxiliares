@@ -95,11 +95,10 @@
 </template>
 
 <script>
-
-    import * as servicios from "../servicios";
-    import VeeValidate, { Validator } from 'vee-validate';
     import es from 'vee-validate/dist/locale/es';
     Validator.localize('es',es);
+    import * as servicios from "../servicios";
+    import VeeValidate, { Validator } from 'vee-validate';
     Vue.use(VeeValidate);
     export default {
         name: "lista-clientes",
