@@ -15,7 +15,7 @@ class ClientesController extends Controller
      */
     public function index()
     {
-        return response(Cliente::all());
+        return response(Cliente::orderBy("apellidos_cl", 'asc')->orderBy("nombres_cl",'asc')->get());
     }
 
     /**
@@ -37,7 +37,7 @@ class ClientesController extends Controller
     public function store(Request $request)
     {
         $validacion =   Validator::make($request->all(), [
-            'dni'       => 'required|string|size:13|unique:clientes,dni',
+            'ruc'       => 'required|string|max:13|min:10|unique:clientes,dni_cl',
             'nombres'   => 'required',
             'apellidos' => 'required',
             'razon'     => 'required',
@@ -46,12 +46,12 @@ class ClientesController extends Controller
             $texto  =   '';
             foreach ($validacion->errors()->all() as $errores)
                 $texto.=$errores.PHP_EOL;
-            return response(['val'=>false,'mensaje'=>$texto,'datos'=>$validacion->errors()->all()],500);
+            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
         }else{
             $nuevo                  =   new Cliente();
             $nuevo->nombres_cl      =   $request->nombres;
             $nuevo->apellidos_cl    =   $request->apellidos;
-            $nuevo->dni_ci          =   $request->dni;
+            $nuevo->dni_cl          =   $request->ruc;
             $nuevo->razon_cl        =   $request->razon;
             $nuevo->save();
             return response(['val'=>true,'mensaje'=>"Se guardó Correctamente $nuevo->apellidos_cl $nuevo->nombres_cl"]);
