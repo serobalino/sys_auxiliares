@@ -1733,10 +1733,10 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _servicios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../servicios */ "./resources/js/servicios/index.js");
-/* harmony import */ var vee_validate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vee-validate */ "./node_modules/vee-validate/dist/vee-validate.esm.js");
-/* harmony import */ var vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vee-validate/dist/locale/es */ "./node_modules/vee-validate/dist/locale/es.js");
-/* harmony import */ var vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vee-validate/dist/locale/es */ "./node_modules/vee-validate/dist/locale/es.js");
+/* harmony import */ var vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _servicios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../servicios */ "./resources/js/servicios/index.js");
+/* harmony import */ var vee_validate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vee-validate */ "./node_modules/vee-validate/dist/vee-validate.esm.js");
 //
 //
 //
@@ -1834,10 +1834,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+vee_validate__WEBPACK_IMPORTED_MODULE_2__["Validator"].localize('es', vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_0___default.a);
 
 
-vee_validate__WEBPACK_IMPORTED_MODULE_1__["Validator"].localize('es', vee_validate_dist_locale_es__WEBPACK_IMPORTED_MODULE_2___default.a);
-Vue.use(vee_validate__WEBPACK_IMPORTED_MODULE_1__["default"]);
+Vue.use(vee_validate__WEBPACK_IMPORTED_MODULE_2__["default"]);
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "lista-clientes",
   data: function data() {
@@ -1880,7 +1880,7 @@ Vue.use(vee_validate__WEBPACK_IMPORTED_MODULE_1__["default"]);
       var _this = this;
 
       this.cargando = true;
-      _servicios__WEBPACK_IMPORTED_MODULE_0__["clientes"].index().then(function (response) {
+      _servicios__WEBPACK_IMPORTED_MODULE_1__["clientes"].index().then(function (response) {
         _this.lista = response.data;
         _this.cargando = false;
       });
@@ -1892,7 +1892,7 @@ Vue.use(vee_validate__WEBPACK_IMPORTED_MODULE_1__["default"]);
         if (result) {
           _this2.estado.id = 2;
           _this2.estado.disabled = true;
-          _servicios__WEBPACK_IMPORTED_MODULE_0__["clientes"].store(_this2.formulario).then(function (response) {
+          _servicios__WEBPACK_IMPORTED_MODULE_1__["clientes"].store(_this2.formulario).then(function (response) {
             _this2.estado.id = 4;
             _this2.estado.mensaje = response.data.mensaje;
             _this2.estado.disabled = false;
