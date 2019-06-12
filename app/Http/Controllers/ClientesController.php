@@ -37,7 +37,8 @@ class ClientesController extends Controller
     public function store(Request $request)
     {
         $validacion =   Validator::make($request->all(), [
-            'ruc'       => 'required|string|max:13|min:10|unique:clientes,dni_cl',
+            'dni'       => 'required|string|max:10|min:10|unique:clientes,dni_cl',
+            'ruc'       => 'required|string|max:13|min:13|unique:clientes,ruc_cl',
             'nombres'   => 'required',
             'apellidos' => 'required',
             'razon'     => 'required',
@@ -51,7 +52,8 @@ class ClientesController extends Controller
             $nuevo                  =   new Cliente();
             $nuevo->nombres_cl      =   $request->nombres;
             $nuevo->apellidos_cl    =   $request->apellidos;
-            $nuevo->dni_cl          =   $request->ruc;
+            $nuevo->dni_cl          =   $request->dni;
+            $nuevo->ruc_cl          =   $request->ruc;
             $nuevo->razon_cl        =   $request->razon;
             $nuevo->save();
             return response(['val'=>true,'mensaje'=>"Se guardó Correctamente $nuevo->apellidos_cl $nuevo->nombres_cl"]);
