@@ -9,6 +9,7 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 import BootstrapVue from 'bootstrap-vue';
+import VueIziToast from "vue-izitoast";
 
 
 
@@ -31,6 +32,7 @@ files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(
  */
 
 Vue.use(BootstrapVue);
+Vue.use(VueIziToast);
 
 const app = new Vue({
     el: '#app',
