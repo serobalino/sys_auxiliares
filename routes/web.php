@@ -26,14 +26,14 @@ Route::get('/prueba',function(){
         'stream_context'=>$context,
         'cache_wsdl'=>WSDL_CACHE_NONE
     );
-    $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantes?wsdl";
-    //$url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
+    //$url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantes?wsdl";
+    $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
     $client=new SoapClient($url,$soapClientOptions);
-    dd($client->__getTypes());
-    $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>'1212201801179001691900121031030002294020121008317']);
-    @$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
-    //simplexml_load_string($string)
-    //return response()->json($aux);
+    //dd($client->__getTypes());
+    $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>'0501201901176804262000120851000009044700766532814']);
+    $aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
+    //simplexml_load_string($string);
+    return response()->json($aux);
 
 });
 

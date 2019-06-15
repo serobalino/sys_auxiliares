@@ -15,7 +15,7 @@
             </div>
             <b-form-file accept=".txt" browse-text="Examinar" v-model="archivo" placeholder="Elija un archivo"></b-form-file>
             <div class="text-center mt-3">
-                <button class="btn btn-info">Subir</button>
+                <button class="btn btn-info" v-on:click="subir">Subir</button>
             </div>
         </b-modal>
         <div class="card-header">Comprobantes Electrónicos</div>
@@ -133,6 +133,11 @@
                 }else{
                     this.$toast.error("Elija un cliente primero", 'Error');
                 }
+            },
+            subir:function(){
+                servicios.comprobantes.store(this.archivo).then((response)=>{
+                    console.log(response)
+                });
             }
         },
         updated(){

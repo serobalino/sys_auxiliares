@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const PREFIJO="/app/comprobantes/";
 
+const CABECERA={headers:{'Content-Type': 'multipart/form-data'}};
+
 export default {
 
     update(cliente,desde=null,hasta=null) {
@@ -9,7 +11,9 @@ export default {
         return axios.patch(PREFIJO+id,{desde:desde,hasta:hasta});
     },
 
-    store(datos){
-        return axios.post(PREFIJO,datos);
+    store(archivo){
+        const data = new FormData();
+        data.append('archivo', archivo);
+        return axios.post(PREFIJO,data);
     }
 };

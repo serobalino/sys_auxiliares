@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Comprobante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
+use SoapClient;
 
 class ComprobantesController extends Controller
 {
@@ -36,7 +38,17 @@ class ComprobantesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $file       =   $request->file('archivo');
+        $archivo    =   file_get_contents($file);
+        $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
+        $elementos  =   explode("	",$archivo);
+        $lista      =   [];
+        foreach ($elementos as $item){
+            if(strlen($item)===49){
+                $lista[]    =   ["clave"=>$item,"comprobante"=>$this->consultar($item)];
+            }
+        }
+        return response($lista);
     }
 
     /**
@@ -94,8 +106,6 @@ class ComprobantesController extends Controller
 
             return response($lista);
         }
-
-
     }
 
     /**
@@ -107,5 +117,33 @@ class ComprobantesController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+
+    /**
+     *
+    ***/
+    public function consultar($claveAceso){
+        $opts=array(
+            'http'=>array(
+                'user_agent'=>'PHPSoapClient'
+            )
+        );
+
+        $context=stream_context_create($opts);
+
+        $soapClientOptions=array(
+            'stream_context'=>$context,
+            'cache_wsdl'=>WSDL_CACHE_NONE
+        );
+
+        $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantes?wsdl";
+
+        //$url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
+
+        $client=new SoapClient($url,$soapClientOptions);
+        //dd($client->__getTypes());
+        return ($client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]));
+        //@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
     }
 }

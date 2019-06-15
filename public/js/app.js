@@ -2072,6 +2072,11 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       } else {
         this.$toast.error("Elija un cliente primero", 'Error');
       }
+    },
+    subir: function subir() {
+      _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].store(this.archivo).then(function (response) {
+        console.log(response);
+      });
     }
   },
   updated: function updated() {}
@@ -108670,7 +108675,11 @@ var render = function() {
           }),
           _vm._v(" "),
           _c("div", { staticClass: "text-center mt-3" }, [
-            _c("button", { staticClass: "btn btn-info" }, [_vm._v("Subir")])
+            _c(
+              "button",
+              { staticClass: "btn btn-info", on: { click: _vm.subir } },
+              [_vm._v("Subir")]
+            )
           ])
         ],
         1
@@ -121795,6 +121804,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 
 var PREFIJO = "/app/comprobantes/";
+var CABECERA = {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+};
 /* harmony default export */ __webpack_exports__["default"] = ({
   update: function update(cliente) {
     var desde = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -121805,8 +121819,10 @@ var PREFIJO = "/app/comprobantes/";
       hasta: hasta
     });
   },
-  store: function store(datos) {
-    return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, datos);
+  store: function store(archivo) {
+    var data = new FormData();
+    data.append('archivo', archivo);
+    return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, data);
   }
 });
 
@@ -121850,8 +121866,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! H:\Documents\GitHub\sys_auxiliares\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! H:\Documents\GitHub\sys_auxiliares\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\sys_auxiliares\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\sys_auxiliares\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
