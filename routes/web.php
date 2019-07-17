@@ -30,7 +30,7 @@ Route::get('/prueba',function(){
     $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
     $client=new SoapClient($url,$soapClientOptions);
     //dd($client->__getTypes());
-    $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>'0501201901176804262000120851000009044700766532814']);
+    $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>'0205201901179269674700120021000000387031968196215']);
     $aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
     //simplexml_load_string($string);
     return response()->json($aux);
