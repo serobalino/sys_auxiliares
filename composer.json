@@ -15,7 +15,10 @@
         "laravel/passport": "^7.3",
         "maatwebsite/excel": "^2.1.0",
         "laravel/tinker": "^1.0",
-        "laraveles/spanish": "^1.2"
+        "laraveles/spanish": "^1.2",
+        "ext-simplexml": "*",
+        "ext-json": "*",
+        "ext-soap": "*"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
