@@ -137,13 +137,15 @@ class ComprobantesController extends Controller
             'cache_wsdl'=>WSDL_CACHE_NONE
         );
 
-        $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantes?wsdl";
+        $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
+        try {
+            $client = new SoapClient($url, $soapClientOptions);
+            $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]);
+            //$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string($aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
+            return response()->json(simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante));
+        } catch (\SoapFault $e) {
+            return response($e,500);
+        }
 
-        //$url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
-
-        $client=new SoapClient($url,$soapClientOptions);
-        //dd($client->__getTypes());
-        return ($client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]));
-        //@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
     }
 }
