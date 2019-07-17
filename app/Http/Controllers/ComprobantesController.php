@@ -6,6 +6,7 @@ use App\Comprobante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Expr\Cast\Object_;
 use SoapClient;
 
 class ComprobantesController extends Controller
@@ -45,7 +46,23 @@ class ComprobantesController extends Controller
         $lista      =   [];
         foreach ($elementos as $item){
             if(strlen($item)===49){
-                $lista[]    =   ["clave"=>$item,"comprobante"=>$this->consultar($item)];
+                $objeto     =  Object_::class( $this->consultar($item)->original);
+                $lista[]    =   ["clave"=>$item,"comprobante"=>$objeto];
+                /*
+                $comprobante    = Comprobante::find($item);
+                if($comprobante){
+
+                }else{
+                    $sri                        =   $this->consultar($item)->original;
+
+                    $comprobante                =   new Comprobante();
+                    $comprobante->id_co         =   $item;
+                    $comprobante->id_tc         =   $item;
+                    $comprobante->fecha_co      =   $item;
+                    $comprobante->estado_co     =   $item;
+                    $comprobante->comprobante   =   $item;
+
+                }*/
             }
         }
         return response($lista);
