@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Jenssegers\Date\Date;
 use SoapClient;
+use stdClass;
 
 class ComprobantesController extends Controller
 {
@@ -37,52 +38,68 @@ class ComprobantesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        $guardados=0;
-        $existentes=0;
-        $nopertenece=0;
-        $son=0;
+    public function store(Request $request){
+        $validacion =   Validator::make($request->all(), [
+            'archivo'       => 'required|file',
+            'cliente'       => 'required|exists:clientes,id_cl',
+        ]);
+        if($validacion->fails()){
+            $texto  =   '';
+            foreach ($validacion->errors()->all() as $errores)
+                $texto.=$errores.PHP_EOL;
+            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
+        }else{
+            set_time_limit ( 600);
+            $guardados=0;
+            $existentes=0;
+            $nopertenece=0;
+            $son=0;
 
-        $file       =   $request->file('archivo');
-        $archivo    =   file_get_contents($file);
-        $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
-        $elementos  =   explode("	",$archivo);
-        $lista      =   [];
-        foreach ($elementos as $item){
-            if(strlen($item)===49 && (int)$item>0){
-                $son++;
-                $comprobante    = Comprobante::find($item);
-                if($comprobante){
-                    $existentes++;
-                }else{
-                    $sri                        =   $this->consultar($item);
-                    $cliente                    =   Cliente::where("dni_cl",$sri->info->identificacionComprador)->orWhere("ruc_cl",$sri->info->identificacionComprador)->first();
-                    if($cliente && @$sri->val){
-                        unset($sri->val);
-                        $comprobante                =   new Comprobante();
-                        $comprobante->id_co         =   $item;
-                        $comprobante->id_tc         =   (int) $sri->infoTributaria->codDoc;
-                        $comprobante->id_cl         =   $cliente->id_cl;
-                        $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$sri->info->fechaEmision)->format("Y-m-d");
-                        $comprobante->estado_co     =   true;
-                        $comprobante->comprobante   =   $sri;
-                        $comprobante->save();
-                        $guardados++;
+            $file       =   $request->file('archivo');
+            $archivo    =   file_get_contents($file);
+            $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
+            $elementos  =   explode("	",$archivo);
+
+            $elegido    =   Cliente::find($request->cliente);
+            foreach ($elementos as $item){
+                if(strlen($item)===49 && (int)$item>0){
+                    $son++;
+                    $comprobante    = Comprobante::find($item);
+                    if($comprobante){
+                        $existentes++;
                     }else{
-                        $errores[]  = ["consulta"=>$sri,"comprobante"=>$item];
-                        $nopertenece++;
+                        $sri                        =   $this->consultar($item);
+                        if($sri->val){
+                            if($elegido->dni_cl===$sri->id || $elegido->ruc_cl===$sri->id){
+                                unset($sri->val);
+                                unset($sri->id);
+                                $comprobante                =   new Comprobante();
+                                $comprobante->id_co         =   $item;
+                                $comprobante->id_tc         =   (int) $sri->infoTributaria->codDoc;
+                                $comprobante->id_cl         =   $elegido->id_cl;
+                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$sri->info->fechaEmision)->format("Y-m-d");
+                                $comprobante->estado_co     =   true;
+                                $comprobante->comprobante   =   $sri;
+                                $comprobante->save();
+                                $guardados++;
+                            }else{
+                                $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"No existe cliente con $sri->id"];
+                                $nopertenece++;
+                            }
+                        }else{
+                            $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"Comprobante no soportado"];
+                        }
                     }
                 }
             }
+            return response([
+                "guardados"     =>  $guardados,
+                "existentes"    =>  $existentes,
+                "nopertenece"   =>  $nopertenece,
+                "son"           =>  $son,
+                "errores"       =>  @$errores,
+            ]);
         }
-        return response([
-            "guardados"     =>  $guardados,
-            "existentes"    =>  $existentes,
-            "nopertenece"   =>  $nopertenece,
-            "son"           =>  $son,
-            "errores"       =>  @$errores
-        ]);
     }
 
     /**
@@ -174,48 +191,60 @@ class ComprobantesController extends Controller
             $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]);
             $aux=simplexml_load_string($aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
             $json=json_decode(json_encode($aux));
-            $json->val=true;
-
             switch ((int)$json->infoTributaria->codDoc) {
                 case 1://factura
+                    $json->val=true;
                     $json->info=$json->infoFactura;
+                    $json->id=$json->info->identificacionComprador;
                     unset($json->infoFactura);
                     break;
                 case 2://nota de venta
+                    $json->val=false;
                     $json->info=$json->infoNotaVenta;
                     unset($json->infoNotaVenta);
                     break;
                 case 3://liquidacion de compra
+                    $json->val=false;
                     $json->info=$json->infoFactura;
                     unset($json->infoFactura);
                     break;
                 case 4://nota de credito
+                    $json->val=true;
+                    $json->id=$json->infoNotaCredito->identificacionComprador;
                     $json->info=$json->infoNotaCredito;
                     unset($json->infoNotaCredito);
                     break;
                 case 5://nota de debito
+                    $json->val=true;
+                    $json->id=$json->infoNotaDebito->identificacionComprador;
                     $json->info=$json->infoNotaDebito;
                     unset($json->infoNotaDebito);
                     break;
                 case 6://guia de remision
+                    $json->val=false;
                     $json->info=$json->infoFactura;
                     unset($json->infoFactura);
                     break;
                 case 7://comprobante de retencion
+                    $json->val=true;
                     $json->info=$json->infoCompRetencion;
+                    $json->id=$json->infoCompRetencion->identificacionSujetoRetenido;
                     unset($json->infoCompRetencion);
                     break;
                 case 8://entradas a espectaculos
+                    $json->val=false;
                     $json->info=$json->infoFactura;
                     unset($json->infoFactura);
                     break;
+                default:
+                    $json->val=false;
+                    break;
             }
-
-
             return $json;
         } catch (\Exception $e) {
-            $aux["val"]=false;
-            $aux["message"]=$e->getMessage();
+            $aux            =   new stdClass();
+            $aux->val       =   false;
+            $aux->message   =   $e->getMessage();
             return $aux;
         }
 
