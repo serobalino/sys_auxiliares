@@ -2007,6 +2007,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -2027,14 +2028,10 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
   watch: {
     cliente: function cliente() {
       this.consulta();
-    },
-    archivo: function archivo(valor) {
-      this.b64 = window.btoa(valor);
     }
   },
   data: function data() {
     return {
-      b64: null,
       archivo: null,
       desde: null,
       hasta: null,
@@ -2074,7 +2071,7 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       }
     },
     subir: function subir() {
-      _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].store(this.archivo).then(function (response) {
+      _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].store(this.archivo, this.cliente).then(function (response) {
         console.log(response);
       });
     }
@@ -108614,76 +108611,98 @@ var render = function() {
     "div",
     { staticClass: "card" },
     [
-      _c(
-        "b-modal",
-        {
-          attrs: {
-            "hide-footer": "",
-            centered: "",
-            id: "resumen",
-            size: "md",
-            title: "Subir Comprobantes"
-          }
-        },
-        [
-          _c(
-            "div",
-            { staticClass: "alert alert-info", attrs: { role: "alert" } },
-            [
-              _c("i", { staticClass: "fa fa-info-circle" }),
-              _vm._v(" Ingrese la información del cliente\n        ")
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "alert alert-warning", attrs: { role: "alert" } },
-            [
-              _c("div", {
-                staticClass: "spinner-border text-primary",
-                attrs: { role: "status" }
-              }),
-              _vm._v(" Procesando\n        ")
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "alert alert-danger", attrs: { role: "alert" } },
-            [_c("i", { staticClass: "fa fa-stop" })]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "alert alert-success", attrs: { role: "alert" } },
-            [_c("i", { staticClass: "fa fa-thumbs-up" })]
-          ),
-          _vm._v(" "),
-          _c("b-form-file", {
-            attrs: {
-              accept: ".txt",
-              "browse-text": "Examinar",
-              placeholder: "Elija un archivo"
+      _vm.cliente
+        ? _c(
+            "b-modal",
+            {
+              attrs: {
+                "hide-footer": "",
+                centered: "",
+                id: "resumen",
+                size: "md",
+                title: "Subir Comprobantes",
+                "no-close-on-esc": "",
+                "no-close-on-backdrop": "",
+                "hide-header-close": ""
+              }
             },
-            model: {
-              value: _vm.archivo,
-              callback: function($$v) {
-                _vm.archivo = $$v
-              },
-              expression: "archivo"
-            }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "text-center mt-3" }, [
-            _c(
-              "button",
-              { staticClass: "btn btn-info", on: { click: _vm.subir } },
-              [_vm._v("Subir")]
-            )
-          ])
-        ],
-        1
-      ),
+            [
+              _c(
+                "div",
+                { staticClass: "alert alert-info", attrs: { role: "alert" } },
+                [
+                  _c("i", { staticClass: "fa fa-info-circle" }),
+                  _vm._v(" Suba el resumen de comprobantes del cliente "),
+                  _c("b", [
+                    _vm._v(
+                      _vm._s(_vm.cliente.apellidos_cl) +
+                        " " +
+                        _vm._s(_vm.cliente.nombres_cl)
+                    )
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "alert alert-warning",
+                  attrs: { role: "alert" }
+                },
+                [
+                  _c("div", {
+                    staticClass: "spinner-border text-primary",
+                    attrs: { role: "status" }
+                  }),
+                  _vm._v(" Procesando\n        ")
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "alert alert-danger", attrs: { role: "alert" } },
+                [_c("i", { staticClass: "fa fa-stop" })]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "alert alert-success",
+                  attrs: { role: "alert" }
+                },
+                [_c("i", { staticClass: "fa fa-thumbs-up" })]
+              ),
+              _vm._v(" "),
+              _c("b-form-file", {
+                attrs: {
+                  accept: ".txt",
+                  "browse-text": "Examinar",
+                  placeholder: "Elija un archivo"
+                },
+                model: {
+                  value: _vm.archivo,
+                  callback: function($$v) {
+                    _vm.archivo = $$v
+                  },
+                  expression: "archivo"
+                }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "text-center mt-3" }, [
+                _c(
+                  "button",
+                  { staticClass: "btn btn-info", on: { click: _vm.subir } },
+                  [_vm._v("Subir")]
+                ),
+                _vm._v(" "),
+                _c("button", { staticClass: "btn btn-danger" }, [
+                  _vm._v("Cancelar")
+                ])
+              ])
+            ],
+            1
+          )
+        : _vm._e(),
       _vm._v(" "),
       _c("div", { staticClass: "card-header" }, [
         _vm._v("Comprobantes Electrónicos")
@@ -121804,11 +121823,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 
 var PREFIJO = "/app/comprobantes/";
-var CABECERA = {
-  headers: {
-    'Content-Type': 'multipart/form-data'
-  }
-};
 /* harmony default export */ __webpack_exports__["default"] = ({
   update: function update(cliente) {
     var desde = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
@@ -121819,9 +121833,10 @@ var CABECERA = {
       hasta: hasta
     });
   },
-  store: function store(archivo) {
+  store: function store(archivo, cliente) {
     var data = new FormData();
     data.append('archivo', archivo);
+    data.append('cliente', cliente.id_cl);
     return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, data);
   }
 });
@@ -121866,8 +121881,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp\htdocs\sys_auxiliares\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\sys_auxiliares\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! H:\Documents\GitHub\sys_auxiliares\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! H:\Documents\GitHub\sys_auxiliares\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
