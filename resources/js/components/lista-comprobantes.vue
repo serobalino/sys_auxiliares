@@ -1,8 +1,8 @@
 <template>
     <div class="card">
-        <b-modal hide-footer centered id="resumen" size="md" title="Subir Comprobantes">
+        <b-modal hide-footer centered id="resumen" size="md" title="Subir Comprobantes" no-close-on-esc no-close-on-backdrop hide-header-close v-if="cliente">
             <div class="alert alert-info" role="alert" >
-                <i class="fa fa-info-circle"></i> Ingrese la información del cliente
+                <i class="fa fa-info-circle"></i> Suba el resumen de comprobantes del cliente <b>{{cliente.apellidos_cl}} {{cliente.nombres_cl}}</b>
             </div>
             <div class="alert alert-warning" role="alert" >
                 <div class="spinner-border text-primary" role="status"></div> Procesando
@@ -16,6 +16,7 @@
             <b-form-file accept=".txt" browse-text="Examinar" v-model="archivo" placeholder="Elija un archivo"></b-form-file>
             <div class="text-center mt-3">
                 <button class="btn btn-info" v-on:click="subir">Subir</button>
+                <button class="btn btn-danger" >Cancelar</button>
             </div>
         </b-modal>
         <div class="card-header">Comprobantes Electrónicos</div>
@@ -87,13 +88,10 @@
         watch:{
             cliente:function(){
                 this.consulta();
-            },
-            archivo:function(valor){
-                this.b64=window.btoa(valor);
             }
         },
         data:()=>({
-            b64:null,
+
             archivo:null,
             desde:null,
             hasta:null,
@@ -135,7 +133,7 @@
                 }
             },
             subir:function(){
-                servicios.comprobantes.store(this.archivo).then((response)=>{
+                servicios.comprobantes.store(this.archivo,this.cliente).then((response)=>{
                     console.log(response)
                 });
             }
