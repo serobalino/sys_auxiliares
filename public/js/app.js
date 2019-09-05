@@ -2008,6 +2008,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -2036,27 +2041,30 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       desde: null,
       hasta: null,
       columns: [{
-        label: 'Name',
-        field: 'name'
-      }, {
-        label: 'Age',
-        field: 'age',
-        type: 'number'
-      }, {
-        label: 'Created On',
-        field: 'createdAt',
+        label: 'Fecha',
+        field: 'fecha_co',
         type: 'date',
         dateInputFormat: 'YYYY-MM-DD',
-        dateOutputFormat: 'MMM Do YY'
+        dateOutputFormat: 'DD-MM-YYYY'
       }, {
-        label: 'Percent',
-        field: 'score',
-        type: 'percentage'
+        label: 'Comprobante',
+        field: 'tipo.detalle_tc' //type: 'number',
+
+      }, {
+        label: 'Emisor',
+        field: this.fieldFn
+      }, {
+        label: 'Valor',
+        field: 'valor',
+        type: 'decimal'
       }],
       filas: []
     };
   },
   methods: {
+    fieldFn: function fieldFn(rowObj) {
+      return rowObj.comprobante.infoTributaria.nombreComercial || rowObj.comprobante.infoTributaria.razonSocial;
+    },
     consulta: function consulta() {
       var _this = this;
 
@@ -108104,14 +108112,14 @@ var render = function() {
   return _c("div", { staticClass: "row" }, [
     _c(
       "div",
-      { staticClass: "col-md-4" },
+      { staticClass: "col-md-3" },
       [_c("lista-clientes", { on: { seleccionado: _vm.clickeado } })],
       1
     ),
     _vm._v(" "),
     _c(
       "div",
-      { staticClass: "col-md-8" },
+      { staticClass: "col-md-9" },
       [_c("lista-comprobantes", { attrs: { cliente: _vm.cliente } })],
       1
     )
@@ -108841,6 +108849,10 @@ var render = function() {
                 ofLabel: "de",
                 pageLabel: "página", // for 'pages' mode
                 allLabel: "Todos"
+              },
+              "sort-options": {
+                enabled: true,
+                initialSortBy: { field: "fecha_co", type: "asc" }
               }
             }
           })
