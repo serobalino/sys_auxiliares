@@ -62,7 +62,12 @@
                         ofLabel: 'de',
                         pageLabel: 'página', // for 'pages' mode
                         allLabel: 'Todos',
-                      }"/>
+                      }"
+                    :sort-options="{
+                        enabled: true,
+                        initialSortBy: {field: 'fecha_co', type: 'asc'}
+                      }"
+            />
         </div>
     </div>
 </template>
@@ -90,37 +95,42 @@
                 this.consulta();
             }
         },
-        data:()=>({
+        data(){
+            return {
+                archivo: null,
+                desde: null,
+                hasta: null,
+                columns: [
+                    {
+                        label: 'Fecha',
+                        field: 'fecha_co',
+                        type: 'date',
+                        dateInputFormat: 'YYYY-MM-DD',
+                        dateOutputFormat: 'DD-MM-YYYY',
+                    },
+                    {
+                        label: 'Comprobante',
+                        field: 'tipo.detalle_tc',
+                        //type: 'number',
+                    },
+                    {
+                        label: 'Emisor',
+                        field: this.fieldFn,
 
-            archivo:null,
-            desde:null,
-            hasta:null,
-            columns: [
-                {
-                    label: 'Name',
-                    field: 'name',
-                },
-                {
-                    label: 'Age',
-                    field: 'age',
-                    type: 'number',
-                },
-                {
-                    label: 'Created On',
-                    field: 'createdAt',
-                    type: 'date',
-                    dateInputFormat: 'YYYY-MM-DD',
-                    dateOutputFormat: 'MMM Do YY',
-                },
-                {
-                    label: 'Percent',
-                    field: 'score',
-                    type: 'percentage',
-                },
-            ],
-            filas: [],
-        }),
+                    },
+                    {
+                        label: 'Valor',
+                        field: 'valor',
+                        type: 'decimal',
+                    },
+                ],
+                filas: [],
+            }
+        },
         methods:{
+            fieldFn(rowObj) {
+                return rowObj.comprobante.infoTributaria.nombreComercial || rowObj.comprobante.infoTributaria.razonSocial;
+            },
             consulta:function(){
                 if(this.cliente){
                     servicios.comprobantes.update(this.cliente,this.desde,this.hasta).then((response)=>{
