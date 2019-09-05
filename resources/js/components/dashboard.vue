@@ -1,9 +1,9 @@
 <template>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <lista-clientes v-on:seleccionado="clickeado"></lista-clientes>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-9">
             <lista-comprobantes :cliente="cliente"></lista-comprobantes>
         </div>
     </div>
