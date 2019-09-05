@@ -15,28 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/prueba',function(){
-    $opts=array(
-        'http'=>array(
-            'user_agent'=>'PHPSoapClient'
-        )
-    );
-    $context=stream_context_create($opts);
-    $soapClientOptions=array(
-        'stream_context'=>$context,
-        'cache_wsdl'=>WSDL_CACHE_NONE
-    );
-    //$url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantes?wsdl";
-    $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
-    $client=new SoapClient($url,$soapClientOptions);
-    //dd($client->__getTypes());
-    $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>'0205201901179269674700120021000000387031968196215']);
-    $aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante_parseado=simplexml_load_string(@$aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
-    //simplexml_load_string($string);
-    return response()->json($aux);
-
-});
-
 Auth::routes(['verify' => true]);
 
 Route::middleware('verified')->group(function () {
