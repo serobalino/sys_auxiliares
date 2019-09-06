@@ -98,9 +98,6 @@
         watch:{
             cliente:function(){
                 this.consulta();
-            },
-            archivo:function(valor){
-                console.log(valor)
             }
         },
         data(){
