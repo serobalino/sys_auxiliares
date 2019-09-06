@@ -11,7 +11,6 @@ export default {
 
     store(archivo,cliente){
         const data = new FormData();
-        console.log(archivo);
         data.append('archivo', archivo);
         data.append('cliente', cliente.id_cl);
         return axios.post(PREFIJO,data, {
