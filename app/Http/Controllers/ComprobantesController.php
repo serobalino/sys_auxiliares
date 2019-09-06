@@ -49,7 +49,7 @@ class ComprobantesController extends Controller
                 $texto.=$errores.PHP_EOL;
             return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
         }else{
-            set_time_limit ( 600);
+            set_time_limit ( 5*60);
             $guardados=0;
             $existentes=0;
             $nopertenece=0;
@@ -87,7 +87,7 @@ class ComprobantesController extends Controller
                                 $nopertenece++;
                             }
                         }else{
-                            $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"Comprobante no soportado"];
+                            $errores[]  = ["respuesta"=>$sri,"comprobante"=>$item];
                         }
                     }
                 }
@@ -97,7 +97,7 @@ class ComprobantesController extends Controller
                 "existentes"    =>  $existentes,
                 "nopertenece"   =>  $nopertenece,
                 "son"           =>  $son,
-                "errores"       =>  @$errores,
+                "errores"       =>  @$errores ? $errores : 0,
             ]);
         }
     }
@@ -244,7 +244,7 @@ class ComprobantesController extends Controller
         } catch (\Exception $e) {
             $aux            =   new stdClass();
             $aux->val       =   false;
-            $aux->message   =   $e->getMessage();
+            $aux->message   =   "No existe el comprobante en la base de datos del SRI";
             return $aux;
         }
 
