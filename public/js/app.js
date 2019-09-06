@@ -2101,9 +2101,8 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].store(this.archivo, this.cliente).then(function (response) {
         _this2.subiendo = false;
         _this2.mensaje.estado = 3;
-        _this2.mensaje.texto = response.data;
-        _this2.mensaje.texto.archivo = _this2.archivo.name;
-        _this2.archivo = null;
+        _this2.mensaje.texto = response.data; // this.mensaje.texto.archivo=this.archivo.name;
+        // this.archivo=null;
       })["catch"](function (error) {
         _this2.subiendo = false;
         _this2.mensaje.estado = 2;
@@ -121910,8 +121909,8 @@ var PREFIJO = "/app/comprobantes/";
   },
   store: function store(archivo, cliente) {
     var data = new FormData();
-    console.log(archivo); //data.append('archivo', archivo);
-
+    console.log(archivo);
+    data.append('archivo', archivo);
     data.append('cliente', cliente.id_cl);
     return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, data, {
       headers: {
