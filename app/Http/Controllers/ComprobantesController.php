@@ -55,50 +55,51 @@ class ComprobantesController extends Controller
             $nopertenece=0;
             $son=0;
 
-            $file       =   $request->file('archivo');
-            $archivo    =   file_get_contents($file);
-            $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
-            $elementos  =   explode("	",$archivo);
-
-            $elegido    =   Cliente::find($request->cliente);
-            foreach ($elementos as $item){
-                if(strlen($item)===49 && (int)$item>0){
-                    $son++;
-                    $comprobante    = Comprobante::find($item);
-                    if($comprobante){
-                        $existentes++;
-                    }else{
-                        $sri                        =   $this->consultar($item);
-                        if($sri->val){
-                            if($elegido->dni_cl===$sri->id || $elegido->ruc_cl===$sri->id){
-                                unset($sri->val);
-                                unset($sri->id);
-                                $comprobante                =   new Comprobante();
-                                $comprobante->id_co         =   $item;
-                                $comprobante->id_tc         =   (int) $sri->infoTributaria->codDoc;
-                                $comprobante->id_cl         =   $elegido->id_cl;
-                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$sri->info->fechaEmision)->format("Y-m-d");
-                                $comprobante->estado_co     =   true;
-                                $comprobante->comprobante   =   $sri;
-                                $comprobante->save();
-                                $guardados++;
-                            }else{
-                                $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"No existe cliente con $sri->id"];
-                                $nopertenece++;
-                            }
-                        }else{
-                            $errores[]  = ["respuesta"=>$sri,"comprobante"=>$item];
-                        }
-                    }
-                }
-            }
-            return response([
-                "guardados"     =>  $guardados,
-                "existentes"    =>  $existentes,
-                "nopertenece"   =>  $nopertenece,
-                "son"           =>  $son,
-                "errores"       =>  @$errores ? $errores : 0,
-            ]);
+//            $file       =   $request->file('archivo');
+//            $archivo    =   file_get_contents($file);
+//            $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
+//            $elementos  =   explode("	",$archivo);
+//
+//            $elegido    =   Cliente::find($request->cliente);
+//            foreach ($elementos as $item){
+//                if(strlen($item)===49 && (int)$item>0){
+//                    $son++;
+//                    $comprobante    = Comprobante::find($item);
+//                    if($comprobante){
+//                        $existentes++;
+//                    }else{
+//                        $sri                        =   $this->consultar($item);
+//                        if($sri->val){
+//                            if($elegido->dni_cl===$sri->id || $elegido->ruc_cl===$sri->id){
+//                                unset($sri->val);
+//                                unset($sri->id);
+//                                $comprobante                =   new Comprobante();
+//                                $comprobante->id_co         =   $item;
+//                                $comprobante->id_tc         =   (int) $sri->infoTributaria->codDoc;
+//                                $comprobante->id_cl         =   $elegido->id_cl;
+//                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$sri->info->fechaEmision)->format("Y-m-d");
+//                                $comprobante->estado_co     =   true;
+//                                $comprobante->comprobante   =   $sri;
+//                                $comprobante->save();
+//                                $guardados++;
+//                            }else{
+//                                $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"No existe cliente con $sri->id"];
+//                                $nopertenece++;
+//                            }
+//                        }else{
+//                            $errores[]  = ["respuesta"=>$sri,"comprobante"=>$item];
+//                        }
+//                    }
+//                }
+//            }
+//            return response([
+//                "guardados"     =>  $guardados,
+//                "existentes"    =>  $existentes,
+//                "nopertenece"   =>  $nopertenece,
+//                "son"           =>  $son,
+//                "errores"       =>  @$errores ? $errores : 0,
+//            ]);
+            return response($request);
         }
     }
 

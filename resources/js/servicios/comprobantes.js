@@ -12,7 +12,7 @@ export default {
     store(archivo,cliente){
         const data = new FormData();
         data.append('archivo', archivo);
-        //data.append('cliente', cliente.id_cl);
+        data.append('cliente', cliente.id_cl);
         return axios.post(PREFIJO,data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
