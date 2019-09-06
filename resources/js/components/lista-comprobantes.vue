@@ -1,22 +1,27 @@
 <template>
     <div class="card">
-        <b-modal hide-footer centered id="resumen" size="md" title="Subir Comprobantes" no-close-on-esc no-close-on-backdrop hide-header-close v-if="cliente">
-            <div class="alert alert-info" role="alert" >
-                <i class="fa fa-info-circle"></i> Suba el resumen de comprobantes del cliente <b>{{cliente.apellidos_cl}} {{cliente.nombres_cl}}</b>
+        <b-modal hide-footer centered id="resumen" size="xl" title="Subir Comprobantes" no-close-on-esc no-close-on-backdrop hide-header-close v-if="cliente">
+            <div v-if="subiendo">
+                <div class="alert alert-warning" role="alert" >
+                    <div class="spinner-border text-primary" role="status"></div> Procesando
+                </div>
             </div>
-            <div class="alert alert-warning" role="alert" >
-                <div class="spinner-border text-primary" role="status"></div> Procesando
+            <div v-else>
+                <div class="alert alert-info" role="alert" v-if="mensaje.estado===1">
+                    <i class="fa fa-info-circle"></i> <span v-html="mensaje.texto"></span>
+                </div>
+                <div class="alert alert-danger" role="alert" v-if="mensaje.estado===2" >
+                    <i class="fa fa-stop"></i> <span v-html="mensaje.texto"></span>
+                </div>
+                <div class="alert alert-success" role="alert" v-if="mensaje.estado===3">
+                    <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                </div>
             </div>
-            <div class="alert alert-danger" role="alert" >
-                <i class="fa fa-stop"></i>
-            </div>
-            <div class="alert alert-success" role="alert">
-                <i class="fa fa-thumbs-up"></i>
-            </div>
-            <b-form-file accept=".txt" browse-text="Examinar" v-model="archivo" placeholder="Elija un archivo"></b-form-file>
+
+            <b-form-file accept=".txt" browse-text="Examinar" v-model="archivo" :disabled="subiendo" placeholder="Elija un archivo"></b-form-file>
             <div class="text-center mt-3">
-                <button class="btn btn-info" v-on:click="subir">Subir</button>
-                <button class="btn btn-danger" >Cancelar</button>
+                <button class="btn btn-info" v-on:click="subir" :disabled="subiendo">Subir</button>
+                <button class="btn btn-danger" v-on:click="ocultarModal" :disabled="subiendo"  >Cancelar</button>
             </div>
         </b-modal>
         <div class="card-header">Comprobantes Electrónicos</div>
@@ -125,14 +130,25 @@
                     },
                 ],
                 filas: [],
+                subiendo:false,
+                mensaje:{
+                    estado:1,
+                    texto:null,
+                }
             }
         },
         methods:{
+            ocultarModal:function(){
+                this.$root.$emit('bv::hide::modal', 'resumen', '#btnShow');
+                this.mensaje.estado=1;
+                this.mensaje.texto="Suba el resumen de comprobantes del cliente \n"+this.cliente.apellidos_cl+" "+this.cliente.nombres_cl+"</b>";
+            },
             fieldFn(rowObj) {
                 return rowObj.comprobante.infoTributaria.nombreComercial || rowObj.comprobante.infoTributaria.razonSocial;
             },
             consulta:function(){
                 if(this.cliente){
+                    this.mensaje.texto="Suba el resumen de comprobantes del cliente \n"+this.cliente.apellidos_cl+" "+this.cliente.nombres_cl+"</b>";
                     servicios.comprobantes.update(this.cliente,this.desde,this.hasta).then((response)=>{
                         this.filas=response.data;
                     }).catch((error)=>{
@@ -143,12 +159,25 @@
                 }
             },
             subir:function(){
+                this.subiendo=true;
                 servicios.comprobantes.store(this.archivo,this.cliente).then((response)=>{
-                    console.log(response)
+                    this.subiendo=false;
+                    this.mensaje.estado=3;
+                    this.mensaje.texto=response.data;
+                    this.mensaje.texto.archivo=this.archivo.name;
+                    this.archivo=null;
+                }).catch(error=>{
+                    this.subiendo=false;
+                    this.mensaje.estado=2;
+                    this.mensaje.texto=error;
+
                 });
             }
         },
         updated(){
+
+        },
+        mounted() {
 
         }
 
@@ -159,5 +188,8 @@
     .botones{
         padding-bottom: 0.5rem;
         padding-top: 0.5rem;
+    }
+    .alert>span{
+        white-space: pre;
     }
 </style>
