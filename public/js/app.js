@@ -121903,7 +121903,7 @@ var PREFIJO = "/app/comprobantes";
     var desde = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     var hasta = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     var id = cliente.id_cl;
-    return axios__WEBPACK_IMPORTED_MODULE_0___default.a.patch(PREFIJO + id, {
+    return axios__WEBPACK_IMPORTED_MODULE_0___default.a.patch(PREFIJO + "/" + id, {
       desde: desde,
       hasta: hasta
     });

@@ -6,7 +6,7 @@ export default {
 
     update(cliente,desde=null,hasta=null) {
         const id=cliente.id_cl;
-        return axios.patch(PREFIJO+id,{desde:desde,hasta:hasta});
+        return axios.patch(PREFIJO+"/"+id,{desde:desde,hasta:hasta});
     },
 
     store(archivo,cliente){
