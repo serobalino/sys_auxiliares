@@ -164,13 +164,14 @@
                     this.subiendo=false;
                     this.mensaje.estado=3;
                     this.mensaje.texto=response.data;
-                    // this.mensaje.texto.archivo=this.archivo.name;
+                    this.$toast.show(this.archivo.name, 'Completado');
                     this.archivo=null;
+                    if(response.data.guardados>0)
+                        this.consulta();
                 }).catch(error=>{
                     this.subiendo=false;
                     this.mensaje.estado=2;
                     this.mensaje.texto=error;
-
                 });
             }
         },
