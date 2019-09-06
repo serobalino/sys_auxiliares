@@ -13,6 +13,10 @@ export default {
         const data = new FormData();
         data.append('archivo', archivo);
         data.append('cliente', cliente.id_cl);
-        return axios.post(PREFIJO,data);
+        return axios.post(PREFIJO,data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
 };
