@@ -121910,8 +121910,8 @@ var PREFIJO = "/app/comprobantes/";
   },
   store: function store(archivo, cliente) {
     var data = new FormData();
-    data.append('archivo', archivo);
-    data.append('cliente', cliente.id_cl);
+    data.append('archivo', archivo); //data.append('cliente', cliente.id_cl);
+
     return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, data, {
       headers: {
         'Content-Type': 'multipart/form-data'
