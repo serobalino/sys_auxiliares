@@ -2013,6 +2013,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -2058,10 +2063,20 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
         field: 'valor',
         type: 'decimal'
       }],
-      filas: []
+      filas: [],
+      subiendo: false,
+      mensaje: {
+        estado: 1,
+        texto: null
+      }
     };
   },
   methods: {
+    ocultarModal: function ocultarModal() {
+      this.$root.$emit('bv::hide::modal', 'resumen', '#btnShow');
+      this.mensaje.estado = 1;
+      this.mensaje.texto = "Suba el resumen de comprobantes del cliente \n" + this.cliente.apellidos_cl + " " + this.cliente.nombres_cl + "</b>";
+    },
     fieldFn: function fieldFn(rowObj) {
       return rowObj.comprobante.infoTributaria.nombreComercial || rowObj.comprobante.infoTributaria.razonSocial;
     },
@@ -2069,6 +2084,7 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       var _this = this;
 
       if (this.cliente) {
+        this.mensaje.texto = "Suba el resumen de comprobantes del cliente \n" + this.cliente.apellidos_cl + " " + this.cliente.nombres_cl + "</b>";
         _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].update(this.cliente, this.desde, this.hasta).then(function (response) {
           _this.filas = response.data;
         })["catch"](function (error) {
@@ -2079,12 +2095,24 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
       }
     },
     subir: function subir() {
+      var _this2 = this;
+
+      this.subiendo = true;
       _servicios__WEBPACK_IMPORTED_MODULE_3__["comprobantes"].store(this.archivo, this.cliente).then(function (response) {
-        console.log(response);
+        _this2.subiendo = false;
+        _this2.mensaje.estado = 3;
+        _this2.mensaje.texto = response.data;
+        _this2.mensaje.texto.archivo = _this2.archivo.name;
+        _this2.archivo = null;
+      })["catch"](function (error) {
+        _this2.subiendo = false;
+        _this2.mensaje.estado = 2;
+        _this2.mensaje.texto = error;
       });
     }
   },
-  updated: function updated() {}
+  updated: function updated() {},
+  mounted: function mounted() {}
 });
 
 /***/ }),
@@ -33883,7 +33911,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.botones[data-v-34e59d58]{\n    padding-bottom: 0.5rem;\n    padding-top: 0.5rem;\n}\n", ""]);
+exports.push([module.i, "\n.botones[data-v-34e59d58]{\n    padding-bottom: 0.5rem;\n    padding-top: 0.5rem;\n}\n.alert>span[data-v-34e59d58]{\n    white-space: pre;\n}\n", ""]);
 
 // exports
 
@@ -108627,7 +108655,7 @@ var render = function() {
                 "hide-footer": "",
                 centered: "",
                 id: "resumen",
-                size: "md",
+                size: "xl",
                 title: "Subir Comprobantes",
                 "no-close-on-esc": "",
                 "no-close-on-backdrop": "",
@@ -108635,56 +108663,81 @@ var render = function() {
               }
             },
             [
-              _c(
-                "div",
-                { staticClass: "alert alert-info", attrs: { role: "alert" } },
-                [
-                  _c("i", { staticClass: "fa fa-info-circle" }),
-                  _vm._v(" Suba el resumen de comprobantes del cliente "),
-                  _c("b", [
-                    _vm._v(
-                      _vm._s(_vm.cliente.apellidos_cl) +
-                        " " +
-                        _vm._s(_vm.cliente.nombres_cl)
+              _vm.subiendo
+                ? _c("div", [
+                    _c(
+                      "div",
+                      {
+                        staticClass: "alert alert-warning",
+                        attrs: { role: "alert" }
+                      },
+                      [
+                        _c("div", {
+                          staticClass: "spinner-border text-primary",
+                          attrs: { role: "status" }
+                        }),
+                        _vm._v(" Procesando\n            ")
+                      ]
                     )
                   ])
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass: "alert alert-warning",
-                  attrs: { role: "alert" }
-                },
-                [
-                  _c("div", {
-                    staticClass: "spinner-border text-primary",
-                    attrs: { role: "status" }
-                  }),
-                  _vm._v(" Procesando\n        ")
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "alert alert-danger", attrs: { role: "alert" } },
-                [_c("i", { staticClass: "fa fa-stop" })]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass: "alert alert-success",
-                  attrs: { role: "alert" }
-                },
-                [_c("i", { staticClass: "fa fa-thumbs-up" })]
-              ),
+                : _c("div", [
+                    _vm.mensaje.estado === 1
+                      ? _c(
+                          "div",
+                          {
+                            staticClass: "alert alert-info",
+                            attrs: { role: "alert" }
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-info-circle" }),
+                            _vm._v(" "),
+                            _c("span", {
+                              domProps: { innerHTML: _vm._s(_vm.mensaje.texto) }
+                            })
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.mensaje.estado === 2
+                      ? _c(
+                          "div",
+                          {
+                            staticClass: "alert alert-danger",
+                            attrs: { role: "alert" }
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-stop" }),
+                            _vm._v(" "),
+                            _c("span", {
+                              domProps: { innerHTML: _vm._s(_vm.mensaje.texto) }
+                            })
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.mensaje.estado === 3
+                      ? _c(
+                          "div",
+                          {
+                            staticClass: "alert alert-success",
+                            attrs: { role: "alert" }
+                          },
+                          [
+                            _c("i", { staticClass: "fa fa-thumbs-up" }),
+                            _vm._v(" "),
+                            _c("span", {
+                              domProps: { innerHTML: _vm._s(_vm.mensaje.texto) }
+                            })
+                          ]
+                        )
+                      : _vm._e()
+                  ]),
               _vm._v(" "),
               _c("b-form-file", {
                 attrs: {
                   accept: ".txt",
                   "browse-text": "Examinar",
+                  disabled: _vm.subiendo,
                   placeholder: "Elija un archivo"
                 },
                 model: {
@@ -108699,13 +108752,23 @@ var render = function() {
               _c("div", { staticClass: "text-center mt-3" }, [
                 _c(
                   "button",
-                  { staticClass: "btn btn-info", on: { click: _vm.subir } },
+                  {
+                    staticClass: "btn btn-info",
+                    attrs: { disabled: _vm.subiendo },
+                    on: { click: _vm.subir }
+                  },
                   [_vm._v("Subir")]
                 ),
                 _vm._v(" "),
-                _c("button", { staticClass: "btn btn-danger" }, [
-                  _vm._v("Cancelar")
-                ])
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger",
+                    attrs: { disabled: _vm.subiendo },
+                    on: { click: _vm.ocultarModal }
+                  },
+                  [_vm._v("Cancelar")]
+                )
               ])
             ],
             1
