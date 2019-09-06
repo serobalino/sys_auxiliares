@@ -102,7 +102,7 @@
         },
         data(){
             return {
-                archivo: {},
+                archivo: null,
                 desde: null,
                 hasta: null,
                 columns: [
