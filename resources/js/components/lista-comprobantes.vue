@@ -159,20 +159,22 @@
                 }
             },
             subir:function(){
-                this.subiendo=true;
-                servicios.comprobantes.store(this.archivo,this.cliente).then((response)=>{
-                    if(response.data.guardados>0)
-                        this.consulta();
-                    this.subiendo=false;
-                    this.archivo=null;
-                    this.mensaje.estado=3;
-                    this.mensaje.texto=response.data;
-                    this.$toast.show(this.archivo.name, 'Completado');
-                }).catch(error=>{
-                    this.subiendo=false;
-                    this.mensaje.estado=2;
-                    this.mensaje.texto=error;
-                });
+                if(this.archivo){
+                    this.subiendo=true;
+                    servicios.comprobantes.store(this.archivo,this.cliente).then((response)=>{
+                        if(response.data.guardados>0)
+                            this.consulta();
+                        this.subiendo=false;
+                        this.mensaje.estado=3;
+                        this.mensaje.texto=response.data;
+                        this.$toast.show(this.archivo.name, 'Completado');
+                        this.archivo=null;
+                    }).catch(error=>{
+                        this.subiendo=false;
+                        this.mensaje.estado=2;
+                        this.mensaje.texto=error;
+                    });
+                }
             }
         },
         updated(){
