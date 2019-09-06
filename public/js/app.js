@@ -2038,6 +2038,9 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
   watch: {
     cliente: function cliente() {
       this.consulta();
+    },
+    archivo: function archivo(valor) {
+      console.log(valor);
     }
   },
   data: function data() {
