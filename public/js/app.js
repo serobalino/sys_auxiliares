@@ -2038,9 +2038,6 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
   watch: {
     cliente: function cliente() {
       this.consulta();
-    },
-    archivo: function archivo(valor) {
-      console.log(valor);
     }
   },
   data: function data() {
@@ -121913,8 +121910,8 @@ var PREFIJO = "/app/comprobantes/";
   },
   store: function store(archivo, cliente) {
     var data = new FormData();
-    console.log(archivo);
-    data.append('archivo', archivo);
+    console.log(archivo); //data.append('archivo', archivo);
+
     data.append('cliente', cliente.id_cl);
     return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(PREFIJO, data, {
       headers: {
