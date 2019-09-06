@@ -165,7 +165,7 @@
                     this.mensaje.estado=3;
                     this.mensaje.texto=response.data;
                     // this.mensaje.texto.archivo=this.archivo.name;
-                    // this.archivo=null;
+                    this.archivo=null;
                 }).catch(error=>{
                     this.subiendo=false;
                     this.mensaje.estado=2;

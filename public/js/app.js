@@ -2102,7 +2102,8 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
         _this2.subiendo = false;
         _this2.mensaje.estado = 3;
         _this2.mensaje.texto = response.data; // this.mensaje.texto.archivo=this.archivo.name;
-        // this.archivo=null;
+
+        _this2.archivo = null;
       })["catch"](function (error) {
         _this2.subiendo = false;
         _this2.mensaje.estado = 2;
@@ -121896,7 +121897,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 
-var PREFIJO = "/app/comprobantes/";
+var PREFIJO = "/app/comprobantes";
 /* harmony default export */ __webpack_exports__["default"] = ({
   update: function update(cliente) {
     var desde = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const PREFIJO="/app/comprobantes/";
+const PREFIJO="/app/comprobantes";
 
 export default {
 
