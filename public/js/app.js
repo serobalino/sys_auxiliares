@@ -2042,7 +2042,7 @@ Vue.use(vue_datetime__WEBPACK_IMPORTED_MODULE_1__["Datetime"]);
   },
   data: function data() {
     return {
-      archivo: null,
+      archivo: {},
       desde: null,
       hasta: null,
       columns: [{
