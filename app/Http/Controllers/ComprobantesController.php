@@ -6,6 +6,9 @@ use App\Cliente;
 use App\Comprobante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PHPExcel_Cell_DataType;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Jenssegers\Date\Date;
 use SoapClient;
 use stdClass;
@@ -103,14 +106,154 @@ class ComprobantesController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function show($id)
+    public function show(Request $request,$id)
     {
-        //
+        $cliente    =   Cliente::find($id);
+        $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
+        $letra      =   "I";
+        $inicio     =   5;
+        $impuestos  =   collect([]);
+
+        $archivo    =   new Spreadsheet();
+        $archivo->getProperties()->setCreator('ASECONT - PUYO');
+        $archivo->getActiveSheet()->setCellValue('A1',$cliente->apellidos_cl." ".$cliente->nombres_cl);
+        $archivo->getActiveSheet()->setCellValue('A2',$cliente->razon_cl);
+        $archivo->getActiveSheet()->setCellValueExplicit('A3',$cliente->ruc_cl,PHPExcel_Cell_DataType::TYPE_STRING);
+        $archivo->getActiveSheet()->mergeCells('A1:M1');
+        $archivo->getActiveSheet()->mergeCells('A2:M2');
+        $archivo->getActiveSheet()->mergeCells('A3:M3');
+        $archivo->getActiveSheet()->getRowDimension('1')->setRowHeight(22);
+        $archivo->getActiveSheet()->getRowDimension('2')->setRowHeight(20);
+        $archivo->getActiveSheet()->getRowDimension('3')->setRowHeight(18);
+        $archivo->getActiveSheet()->getStyle("A1")->getFont()->setBold(true);
+        $archivo->getActiveSheet()->getStyle("A2")->getFont()->setBold(true);
+        $archivo->getActiveSheet()->getStyle("A3")->getFont()->setBold(true);
+        //$archivo->getActiveSheet()->getStyle('A2:I2')->getFill()->setFillType();
+        $archivo->getActiveSheet()->getStyle('A1:A3')->getFill()->getStartColor()->setARGB('29bb04');
+        $titulos_sty = array(
+            'font'  => array(
+                'bold'  => true,
+                'color' => array('rgb' => '292542'),
+                'size'  => 13,
+                'name'  => 'Verdana'
+            ));
+        $archivo->getActiveSheet()->getStyle('A1')->applyFromArray($titulos_sty);
+        $archivo->getActiveSheet()->getStyle('A2')->applyFromArray($titulos_sty);
+        $archivo->getActiveSheet()->getStyle('A3')->applyFromArray($titulos_sty);
+        $archivo->getActiveSheet()->getStyle('A1:B3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $fila   =   $inicio;
+        $cont   =   0;
+        //auxiliares
+        $aux_ano    =   "";
+        $aux_mes    =   "";
+        $archivo->getActiveSheet()->setCellValue("A$fila","Num");
+        $archivo->getActiveSheet()->setCellValue("B$fila","Fecha");
+        $archivo->getActiveSheet()->setCellValue("C$fila","Secuencial");
+        $archivo->getActiveSheet()->setCellValue("D$fila","RUC");
+        $archivo->getActiveSheet()->setCellValue("E$fila","Nombre Comercial");
+        $archivo->getActiveSheet()->setCellValue("F$fila","Detalle");
+        $archivo->getActiveSheet()->setCellValue("G$fila","Base Imponible");
+        $archivo->getActiveSheet()->setCellValue("H$fila","Descuento");
+
+        $fila++;
+        Date::setLocale('es');
+        $data   =   $this->consultaFecha($request->desde,$request->hasta,$id);
+        foreach ($data as $nivel){
+            //fecha
+            $fecha  =   Date::createFromFormat('Y-m-d',$nivel->fecha_co);
+            $ano    =   $fecha->format('Y');
+            $dia    =   $fecha->format('j');
+            $mes    =   $fecha->format('F');
+            $minMes =   mb_strtoupper(substr($mes, 0,3));
+            if($ano!==$aux_ano){
+                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
+                $archivo->getActiveSheet()->setCellValue("A$fila",$ano);
+                $fila++;
+                $aux_ano=$ano;
+                $aux_mes=$mes;
+            }
+            if($mes!=$aux_mes){
+                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
+                $fila++;
+                $aux_mes=$mes;
+                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
+                $fila++;
+
+            }
+
+            if(gettype($nivel->comprobante->detalles->detalle)==="array")
+                $producto="VARIOS PRODUCTOS";
+            else
+                $producto=mb_strtoupper($nivel->comprobante->detalles->detalle->descripcion);
+
+            $empresa=mb_strtoupper(@$nivel->comprobante->infoTributaria->nombreComercial);
+            if(!$empresa)
+                $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->razonSocial);
+            $cont++;
+            $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
+            $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
+                ->setCellValue("B$fila","$minMes-$dia")
+                ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValue("E$fila",$empresa)
+                ->setCellValue("F$fila",$producto)
+                ->setCellValue("G$fila",$nivel->comprobante->info->totalSinImpuestos)
+                ->setCellValue("H$fila",$nivel->comprobante->info->totalDescuento);
+            if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
+                foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
+                    $aux    =   $this->listaImpuestos($impuestos,$impuesto,$letra);
+                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->valor);
+                }
+            }else{
+                $aux    =   $this->listaImpuestos($impuestos,$nivel->comprobante->info->totalConImpuestos->totalImpuesto,$letra);
+                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+            }
+            $fila++;
+        }
+        $letra++;
+
+
+        $fila   =   $inicio+1;
+        foreach ($data as $nivel){
+            $fila++;
+            $archivo->getActiveSheet()->setCellValue($letra.$fila,$nivel->comprobante->info->importeTotal);
+        }
+
+        for ($i="I";$i<=$letra;$i++ ){
+            $archivo->getActiveSheet()->setCellValue($letra.$inicio,$i);
+        }
+
+
+        for ($i="A";$i<=$letra;$i++ ){
+            $archivo->getActiveSheet()->getColumnDimension($i)->setAutoSize(true);
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment;filename=$nomArchivo.xlsx");
+        header('Cache-Control: max-age=0');
+        header("nombre: $nomArchivo.xlsx");
+        $salida = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($archivo, 'Xlsx');
+        $salida->save('php://output');
+        exit;
+    }
+
+    private function listaImpuestos($array,$impuesto,$letra){
+        $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->first();
+        if($resultado){
+            return (object)$resultado;
+        }else{
+            $letra++;
+            $obj    =   ['letra'=>$letra,'codigo'=>$impuesto->codigo,'codigoPorcentaje'=>$impuesto->codigoPorcentaje];
+            //todo agregar objeto de tablas
+            $obj    =   (object)$obj;
+            $array->push($obj);
+            return $obj;
+        }
     }
 
     /**
@@ -143,19 +286,23 @@ class ComprobantesController extends Controller
                 $texto.=$errores.PHP_EOL;
             return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
         }else{
-            if($request->desde && $request->hasta)
-                $lista  =   Comprobante::where("id_cl",$id)
-                    ->orderBy("fecha_co","asc")
-                    ->orderBy("id_tc","desc")
-                    ->whereBetween('fecha_co', [$request->desde, $request->hasta])
-                    ->get();
-            else
-                $lista  =   Comprobante::where("id_cl",$id)
-                    ->orderBy("fecha_co","asc")
-                    ->orderBy("id_tc","desc")
-                    ->get();
-
+            $lista = $this->consultaFecha($request->desde,$request->hasta,$id);
             return response($lista);
+        }
+    }
+
+    private function consultaFecha($desde,$hasta,$id){
+        if($desde || $hasta){
+            return Comprobante::where("id_cl",$id)
+                ->orderBy("fecha_co","asc")
+                ->orderBy("id_tc","desc")
+                ->whereBetween('fecha_co', [$desde, $hasta])
+                ->get();
+        }else{
+            return Comprobante::where("id_cl",$id)
+                ->orderBy("fecha_co","asc")
+                ->orderBy("id_tc","desc")
+                ->get();
         }
     }
 

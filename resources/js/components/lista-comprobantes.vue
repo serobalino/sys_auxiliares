@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="botones text-right">
-                <button class="btn btn-success" v-if="filas.length>0"><i class="fa fa-file-excel-o" ></i> Generar Excel</button>
+                <button class="btn btn-success" v-if="excel" v-on:click="descargarExcel"><i class="fa fa-file-excel-o" ></i> Generar Excel</button>
                 <button class="btn btn-primary" v-on:click="consulta">Buscar</button>
             </div>
             <vue-good-table
@@ -98,6 +98,12 @@
         watch:{
             cliente:function(){
                 this.consulta();
+            },
+            desde:function(){
+                this.excel=false;
+            },
+            hasta:function(){
+                this.excel=false;
             }
         },
         data(){
@@ -134,7 +140,8 @@
                 mensaje:{
                     estado:1,
                     texto:null,
-                }
+                },
+                excel:false,
             }
         },
         methods:{
@@ -151,12 +158,21 @@
                     this.mensaje.texto="Suba el resumen de comprobantes del cliente \n"+this.cliente.apellidos_cl+" "+this.cliente.nombres_cl+"</b>";
                     servicios.comprobantes.update(this.cliente,this.desde,this.hasta).then((response)=>{
                         this.filas=response.data;
+                        if(response.data.length)
+                            this.excel=true;
                     }).catch((error)=>{
                         this.$toast.error(error.response.data.message, 'Error');
+                        this.excel=false;
                     });
                 }else{
                     this.$toast.error("Elija un cliente primero", 'Error');
                 }
+            },
+            descargarExcel:function(){
+                servicios.comprobantes.descargar(this.cliente,this.desde,this.hasta).then((response)=>{
+                    let fileDownload = require('js-file-download');
+                    fileDownload(response.data, response.headers.nombre);
+                });
             },
             subir:function(){
                 if(this.archivo){

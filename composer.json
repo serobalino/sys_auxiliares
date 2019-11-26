@@ -16,6 +16,7 @@
         "maatwebsite/excel": "^2.1.0",
         "laravel/tinker": "^1.0",
         "laraveles/spanish": "^1.2",
+        "phpoffice/phpspreadsheet": "^1.0",
         "ext-simplexml": "*",
         "ext-json": "*",
         "ext-soap": "*"
