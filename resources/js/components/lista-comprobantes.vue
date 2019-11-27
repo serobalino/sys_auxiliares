@@ -29,7 +29,7 @@
             <b-alert show variant="info" v-if="cliente">
                 <h4 class="alert-heading">{{cliente.razon_cl}}</h4>
                 <p>{{cliente.apellidos_cl}} {{cliente.nombres_cl}}</p>
-                <button class="btn btn-success"  v-b-modal.resumen  >Subir Reporte</button>
+                <button class="btn btn-success"  v-b-modal.resumen  >Subir Reporte del SRI</button>
                 <hr>
                 <p class="mb-0">
                    <b>Cédula</b> {{cliente.dni_cl}}<br>

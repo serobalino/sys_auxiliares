@@ -13,10 +13,10 @@ class CreateTabla17Table extends Migration
      */
     public function up()
     {
-        //tarifa del iva
+        //lista de impuestos
         Schema::create('tabla17', function (Blueprint $table) {
             $table->smallInteger('cod_t17');
-            $table->string("porcentaje_t17")->nullable();
+            $table->string("impuesto_t17")->nullable();
         });
     }
 

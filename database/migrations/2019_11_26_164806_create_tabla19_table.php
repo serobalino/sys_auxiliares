@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTabla16Table extends Migration
+class CreateTabla19Table extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateTabla16Table extends Migration
      */
     public function up()
     {
-        //lista de impuestos
-        Schema::create('tabla16', function (Blueprint $table) {
-            $table->smallInteger('cod_t16');
-            $table->string("impuesto_t16")->nullable();
+        //lista de impuestos ICE
+        Schema::create('tabla19', function (Blueprint $table) {
+            $table->bigInteger('cod_t19');
+            $table->string("detalle_t18",350)->nullable();
+            $table->string("especifico_t18")->nullable();
+            $table->float("valorem_t18")->nullable();
         });
     }
 
