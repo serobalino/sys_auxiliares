@@ -9,10 +9,8 @@ export default {
         return axios.patch(PREFIJO+"/"+id,{desde:desde,hasta:hasta});
     },
     descargar(cliente,desde,hasta) {
-        return axios({
-            method: 'get',
-            url: PREFIJO+"/"+cliente.id_cl,
-            data: {
+        return axios.get(PREFIJO+"/"+cliente.id_cl,{
+            params:{
                 desde:desde,
                 hasta:hasta
             },
