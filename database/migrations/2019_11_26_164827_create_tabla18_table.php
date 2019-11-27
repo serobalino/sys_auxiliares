@@ -13,11 +13,10 @@ class CreateTabla18Table extends Migration
      */
     public function up()
     {
+        //tarifa iva
         Schema::create('tabla18', function (Blueprint $table) {
-            $table->bigInteger('cod_t18');
-            $table->string("detalle_t18",350)->nullable();
-            $table->float("especifico_t18")->nullable();
-            $table->float("valorem_t18")->nullable();
+            $table->smallInteger('cod_t18');
+            $table->string("detalle_t18")->nullable();
         });
     }
 
