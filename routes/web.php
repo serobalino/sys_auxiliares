@@ -23,5 +23,6 @@ Route::middleware('verified')->group(function () {
     Route::prefix('app')->group(function () {
         Route::resource("clientes","ClientesController");
         Route::resource("comprobantes","ComprobantesController");
+        Route::post("comprobantes2","ComprobantesController@store2");
     });
 });
