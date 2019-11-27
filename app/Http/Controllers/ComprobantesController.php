@@ -43,7 +43,7 @@ class ComprobantesController extends Controller
      */
     public function store(Request $request){
         $validacion =   Validator::make($request->all(), [
-            'archivo'       => 'required|file',
+            'archivo'       => 'required|file|mimes:txt',
             'cliente'       => 'required|exists:clientes,id_cl',
         ]);
         if($validacion->fails()){
