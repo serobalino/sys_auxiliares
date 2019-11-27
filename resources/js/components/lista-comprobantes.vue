@@ -228,7 +228,11 @@
                         this.subiendo=false;
                         this.mensaje.estado=3;
                         this.mensaje.texto=response.data;
-                        this.$toast.show(this.archivo.name, 'Completado');
+                        let lista="";
+                        lista+= this.archivo.map(i=>{
+                            return i.name+"</br>";
+                        });
+                        this.$toast.show(lista,'Completado');
                         this.archivo=null;
                     }).catch(error=>{
                         this.subiendo=false;
