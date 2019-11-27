@@ -343,11 +343,13 @@ class ComprobantesController extends Controller
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
                 ->whereBetween('fecha_co', [$desde, $hasta])
+                ->where('id_tc',1)
                 ->get();
         }else{
             return Comprobante::where("id_cl",$id)
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
+                ->where('id_tc',1)
                 ->get();
         }
     }
