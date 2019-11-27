@@ -11,7 +11,7 @@
                     <i class="fa fa-info-circle"></i> <span v-html="mensaje.texto"></span>
                 </div>
                 <div class="alert alert-danger" role="alert" v-if="mensaje.estado===2" >
-                    <i class="fa fa-stop"></i> <span v-html="mensaje.texto"></span>
+                    <span v-html="mensaje.texto"></span>
                 </div>
                 <div class="alert alert-success" role="alert" v-if="mensaje.estado===3">
                     <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
@@ -24,12 +24,37 @@
                 <button class="btn btn-danger" v-on:click="ocultarModal" :disabled="subiendo"  >Cancelar</button>
             </div>
         </b-modal>
+        <b-modal hide-footer centered id="resumen2" size="xl" title="Subir Comprobantes XLM" no-close-on-esc no-close-on-backdrop hide-header-close v-if="cliente">
+            <div v-if="subiendo">
+                <div class="alert alert-warning" role="alert" >
+                    <div class="spinner-border text-primary" role="status"></div> Procesando
+                </div>
+            </div>
+            <div v-else>
+                <div class="alert alert-info" role="alert" v-if="mensaje.estado===1">
+                    <i class="fa fa-info-circle"></i> <span v-html="mensaje.texto"></span>
+                </div>
+                <div class="alert alert-danger" role="alert" v-if="mensaje.estado===2" >
+                    <span v-html="mensaje.texto"></span>
+                </div>
+                <div class="alert alert-success" role="alert" v-if="mensaje.estado===3">
+                    <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                </div>
+            </div>
+
+            <b-form-file accept=".xml" browse-text="Examinar" v-model="archivo" :disabled="subiendo" multiple placeholder="Elija varios archivos"></b-form-file>
+            <div class="text-center mt-3">
+                <button class="btn btn-info" v-on:click="subir2" :disabled="subiendo">Subir</button>
+                <button class="btn btn-danger" v-on:click="ocultarModal" :disabled="subiendo"  >Cancelar</button>
+            </div>
+        </b-modal>
         <div class="card-header">Comprobantes Electrónicos</div>
         <div class="card-body">
             <b-alert show variant="info" v-if="cliente">
                 <h4 class="alert-heading">{{cliente.razon_cl}}</h4>
                 <p>{{cliente.apellidos_cl}} {{cliente.nombres_cl}}</p>
                 <button class="btn btn-success"  v-b-modal.resumen  >Subir Reporte del SRI</button>
+                <button class="btn btn-success"  v-b-modal.resumen2  >Subir XML del SRI</button>
                 <hr>
                 <p class="mb-0">
                    <b>Cédula</b> {{cliente.dni_cl}}<br>
@@ -97,6 +122,7 @@
         },
         watch:{
             cliente:function(){
+                this.filas=[];
                 this.consulta();
             },
             desde:function(){
@@ -147,6 +173,7 @@
         methods:{
             ocultarModal:function(){
                 this.$root.$emit('bv::hide::modal', 'resumen', '#btnShow');
+                this.$root.$emit('bv::hide::modal', 'resumen2', '#btnShow');
                 this.mensaje.estado=1;
                 this.mensaje.texto="Suba el resumen de comprobantes del cliente \n"+this.cliente.apellidos_cl+" "+this.cliente.nombres_cl+"</b>";
             },
@@ -188,7 +215,25 @@
                     }).catch(error=>{
                         this.subiendo=false;
                         this.mensaje.estado=2;
-                        this.mensaje.texto=error;
+                        this.mensaje.texto=error.response.data.message;
+                    });
+                }
+            },
+            subir2:function(){
+                if(this.archivo){
+                    this.subiendo=true;
+                    servicios.comprobantes.store2(this.archivo,this.cliente).then((response)=>{
+                        if(response.data.guardados>0)
+                            this.consulta();
+                        this.subiendo=false;
+                        this.mensaje.estado=3;
+                        this.mensaje.texto=response.data;
+                        this.$toast.show(this.archivo.name, 'Completado');
+                        this.archivo=null;
+                    }).catch(error=>{
+                        this.subiendo=false;
+                        this.mensaje.estado=2;
+                        this.mensaje.texto=error.response.data.message;
                     });
                 }
             }
