@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Catalogos\Tabla17;
+use App\Catalogos\Tabla18;
+use App\Catalogos\Tabla19;
 use App\Cliente;
 use App\Comprobante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PHPExcel_Cell_DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Jenssegers\Date\Date;
 use SoapClient;
 use stdClass;
 
 class ComprobantesController extends Controller
 {
+
+    private $impuestos  =   [];
+
+    private $letra      =   "H";
     /**
      * Display a listing of the resource.
      *
@@ -115,18 +121,13 @@ class ComprobantesController extends Controller
     {
         $cliente    =   Cliente::find($id);
         $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
-        $letra      =   "I";
         $inicio     =   5;
-        $impuestos  =   collect([]);
 
         $archivo    =   new Spreadsheet();
         $archivo->getProperties()->setCreator('ASECONT - PUYO');
         $archivo->getActiveSheet()->setCellValue('A1',$cliente->apellidos_cl." ".$cliente->nombres_cl);
         $archivo->getActiveSheet()->setCellValue('A2',$cliente->razon_cl);
         $archivo->getActiveSheet()->setCellValueExplicit('A3',$cliente->ruc_cl,PHPExcel_Cell_DataType::TYPE_STRING);
-        $archivo->getActiveSheet()->mergeCells('A1:M1');
-        $archivo->getActiveSheet()->mergeCells('A2:M2');
-        $archivo->getActiveSheet()->mergeCells('A3:M3');
         $archivo->getActiveSheet()->getRowDimension('1')->setRowHeight(22);
         $archivo->getActiveSheet()->getRowDimension('2')->setRowHeight(20);
         $archivo->getActiveSheet()->getRowDimension('3')->setRowHeight(18);
@@ -153,7 +154,7 @@ class ComprobantesController extends Controller
         $aux_mes    =   "";
         $archivo->getActiveSheet()->setCellValue("A$fila","Num");
         $archivo->getActiveSheet()->setCellValue("B$fila","Fecha");
-        $archivo->getActiveSheet()->setCellValue("C$fila","Secuencial");
+        $archivo->getActiveSheet()->setCellValue("C$fila","Clave de Acceso");
         $archivo->getActiveSheet()->setCellValue("D$fila","RUC");
         $archivo->getActiveSheet()->setCellValue("E$fila","Nombre Comercial");
         $archivo->getActiveSheet()->setCellValue("F$fila","Detalle");
@@ -182,8 +183,6 @@ class ComprobantesController extends Controller
                 $fila++;
                 $aux_mes=$mes;
                 $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-                $fila++;
-
             }
 
             if(gettype($nivel->comprobante->detalles->detalle)==="array")
@@ -203,55 +202,102 @@ class ComprobantesController extends Controller
                 ->setCellValue("E$fila",$empresa)
                 ->setCellValue("F$fila",$producto)
                 ->setCellValue("G$fila",$nivel->comprobante->info->totalSinImpuestos)
-                ->setCellValue("H$fila",$nivel->comprobante->info->totalDescuento);
+                ->setCellValue("H$fila",$nivel->comprobante->info->totalDescuento>0 ? $nivel->comprobante->info->totalDescuento : '');
+
+            $archivo->getActiveSheet()->getStyle("G$fila")->getNumberFormat()->setFormatCode('0.00');
+            $archivo->getActiveSheet()->getStyle("H$fila")->getNumberFormat()->setFormatCode('0.00');
+
             if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
                 foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
-                    $aux    =   $this->listaImpuestos($impuestos,$impuesto,$letra);
-                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->valor);
+                    if($impuesto->valor>0){
+                        $aux    =   $this->listaImpuestos($impuesto);
+                        $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->valor);
+                        $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                    }
                 }
             }else{
-                $aux    =   $this->listaImpuestos($impuestos,$nivel->comprobante->info->totalConImpuestos->totalImpuesto,$letra);
-                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
+                    $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto);
+                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                    $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                }
             }
             $fila++;
         }
-        $letra++;
+        //Aumenta una columna para el total
+        $this->letra++;
 
-
+        $archivo->getActiveSheet()->getStyle("A$inicio:$this->letra$inicio")->getAlignment()->setHorizontal('center');
+        //agrega el valor total de la factura
         $fila   =   $inicio+1;
+        $aux_ano    =   "";
+        $aux_mes    =   "";
         foreach ($data as $nivel){
+            $fecha  =   Date::createFromFormat('Y-m-d',$nivel->fecha_co);
+            $ano    =   $fecha->format('Y');
+            $mes    =   $fecha->format('F');
+            if($ano!==$aux_ano){
+                $fila++;
+                $aux_ano=$ano;
+                $aux_mes=$mes;
+            }
+            if($mes!=$aux_mes){
+                $fila++;
+                $aux_mes=$mes;
+            }
+            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,$nivel->comprobante->info->importeTotal);
+            $archivo->getActiveSheet()->getStyle($this->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
             $fila++;
-            $archivo->getActiveSheet()->setCellValue($letra.$fila,$nivel->comprobante->info->importeTotal);
         }
 
-        for ($i="I";$i<=$letra;$i++ ){
-            $archivo->getActiveSheet()->setCellValue($letra.$inicio,$i);
+        //Titulos en los impuestos
+        for ($i="I";$i<=$this->letra;$i++ ){
+            $array      =   collect($this->impuestos);
+            $resultado  =   $array->where('letra',$i)->first();
+            $archivo->getActiveSheet()->setCellValue($i.$inicio,@$resultado->por->detalle_t18);
         }
+        //Titulo al final
+        $archivo->getActiveSheet()->setCellValue($this->letra.$inicio,"Total");
 
-
-        for ($i="A";$i<=$letra;$i++ ){
+        //Ajuta el tamaño de la celda para todas las columnas usadas
+        for ($i="A";$i<=$this->letra;$i++ ){
             $archivo->getActiveSheet()->getColumnDimension($i)->setAutoSize(true);
         }
+
+        //Combinar celdas
+        $archivo->getActiveSheet()->mergeCells("A1:".$this->letra."1");
+        $archivo->getActiveSheet()->mergeCells("A2:".$this->letra."2");
+        $archivo->getActiveSheet()->mergeCells("A3:".$this->letra."3");
+
+        $actual =   now();
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=$nomArchivo.xlsx");
         header('Cache-Control: max-age=0');
-        header("nombre: $nomArchivo.xlsx");
+        header("nombre: $nomArchivo $actual.xlsx");
         $salida = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($archivo, 'Xlsx');
         $salida->save('php://output');
         exit;
     }
 
-    private function listaImpuestos($array,$impuesto,$letra){
+    private function listaImpuestos($impuesto){
+        $array      =   collect($this->impuestos);
         $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->first();
         if($resultado){
             return (object)$resultado;
         }else{
-            $letra++;
-            $obj    =   ['letra'=>$letra,'codigo'=>$impuesto->codigo,'codigoPorcentaje'=>$impuesto->codigoPorcentaje];
-            //todo agregar objeto de tablas
+            $this->letra++;
+            $obj    =   [
+                'letra'=>$this->letra,
+                'codigo'=>$impuesto->codigo,
+                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
+                'tarifa'=>@$impuesto->tarifa,
+                'imp'=>Tabla17::find($impuesto->codigo),
+                'por'=>Tabla18::find($impuesto->codigo) ? Tabla18::find($impuesto->codigo) : Tabla19::find($impuesto->codigo)
+            ];
             $obj    =   (object)$obj;
             $array->push($obj);
+            $this->impuestos=$array;
             return $obj;
         }
     }
