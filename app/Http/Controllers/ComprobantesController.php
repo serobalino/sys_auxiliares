@@ -8,10 +8,12 @@ use App\Catalogos\Tabla19;
 use App\Cliente;
 use App\Comprobante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use PHPExcel_Cell_DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Jenssegers\Date\Date;
+use SimpleXMLElement;
 use SoapClient;
 use stdClass;
 
@@ -39,6 +41,77 @@ class ComprobantesController extends Controller
     public function create()
     {
         //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store2(Request $request){
+        $validacion =   Validator::make($request->all(), [
+            'archivos'      => 'required|array',
+            'archivos.*'    => 'file|mimes:xml',
+            'cliente'       => 'required|exists:clientes,id_cl',
+        ]);
+        if($validacion->fails()){
+            $texto  =   '';
+            foreach ($validacion->errors()->all() as $errores)
+                $texto.=$errores.PHP_EOL;
+            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
+        }else{
+            set_time_limit ( 5*60);
+            $guardados=0;
+            $existentes=0;
+            $nopertenece=0;
+            $son=0;
+
+            $elegido    =   Cliente::find($request->cliente);
+
+            $files      =   $request->file('archivos');
+            foreach ($files as $item){
+                $xml    =   $this->parseXml(new SimpleXMLElement(file_get_contents($item)),$item);
+                $son++;
+                if($xml->val){
+                    if(strlen($xml->infoTributaria->claveAcceso)===49 && (int)$xml->infoTributaria->claveAcceso>0){
+                        $comprobante    = Comprobante::find($xml->infoTributaria->claveAcceso);
+                        if($comprobante){
+                            $existentes++;
+                        }else{
+                            if($elegido->dni_cl===$xml->id || $elegido->ruc_cl===$xml->id){
+                                unset($xml->val);
+                                unset($xml->id);
+                                $comprobante                =   new Comprobante();
+                                $comprobante->id_co         =   $xml->infoTributaria->claveAcceso;
+                                $comprobante->id_tc         =   (int) $xml->infoTributaria->codDoc;
+                                $comprobante->id_cl         =   $elegido->id_cl;
+                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$xml->info->fechaEmision)->format("Y-m-d");
+                                $comprobante->estado_co     =   true;
+                                $comprobante->comprobante   =   $xml;
+                                $comprobante->save();
+                                $guardados++;
+                            }else{
+                                $errores[]  = ["consulta"=>$xml,"comprobante"=>$xml->infoTributaria->claveAcceso,"mesanjes"=>"No existe cliente con $xml->id"];
+                                $nopertenece++;
+                            }
+
+                        }
+                    }else{
+                        $errores[]  = ["respuesta"=>$xml,"comprobante"=>$xml->infoTributaria->claveAcceso];
+                    }
+                }else{
+                    $errores[]  = ["respuesta"=>$xml->message];
+                }
+            }
+            return response([
+                "guardados"     =>  $guardados,
+                "existentes"    =>  $existentes,
+                "nopertenece"   =>  $nopertenece,
+                "son"           =>  $son,
+                "errores"       =>  @$errores ? $errores : 0,
+            ]);
+        }
     }
 
     /**
@@ -383,7 +456,18 @@ class ComprobantesController extends Controller
         $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
         try {
             $client = new SoapClient($url, $soapClientOptions);
-            $aux=$client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]);
+            return $this->parseXml($client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]));
+        } catch (\Exception $e) {
+            $aux            =   new stdClass();
+            $aux->val       =   false;
+            $aux->message   =   "No existe el comprobante en la base de datos del SRI";
+            return $aux;
+        }
+
+    }
+
+    private function parseXml($aux,$archivo=null){
+        try {
             $aux=simplexml_load_string($aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
             $json=json_decode(json_encode($aux));
             switch ((int)$json->infoTributaria->codDoc) {
@@ -437,11 +521,8 @@ class ComprobantesController extends Controller
             }
             return $json;
         } catch (\Exception $e) {
-            $aux            =   new stdClass();
-            $aux->val       =   false;
-            $aux->message   =   "No existe el comprobante en la base de datos del SRI";
-            return $aux;
+            $nombre    =   @$archivo->getClientOriginalName();
+            return (object)['val'=>false,'message'=>"Error en la estructura del Comprobante Electrónico $nombre"];
         }
-
     }
 }
