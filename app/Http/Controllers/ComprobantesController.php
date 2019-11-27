@@ -465,10 +465,21 @@ class ComprobantesController extends Controller
         }
 
     }
+    private function enlinea($xml){
+        return simplexml_load_string($xml->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
+    }
+
+    private function offlinea($xml){
+        return simplexml_load_string($xml->comprobante);
+    }
 
     private function parseXml($aux,$archivo=null){
         try {
-            $aux=simplexml_load_string($aux->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
+            try{
+                $aux=$this->enlinea($aux);
+            }catch (\Exception $e) {
+                $aux=$this->offlinea($aux);
+            }
             $json=json_decode(json_encode($aux));
             switch ((int)$json->infoTributaria->codDoc) {
                 case 1://factura
