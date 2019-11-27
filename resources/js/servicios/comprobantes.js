@@ -26,5 +26,17 @@ export default {
                 'Content-Type': 'multipart/form-data'
             }
         });
+    },
+    store2(archivos,cliente){
+        const data = new FormData();
+        for( let i = 0; i < archivos.length; i++ ){
+            data.append('archivos[' + i + ']', archivos[i]);
+        }
+        data.append('cliente', cliente.id_cl);
+        return axios.post(PREFIJO+2,data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
 };
