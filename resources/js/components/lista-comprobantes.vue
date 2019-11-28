@@ -148,12 +148,10 @@
                     {
                         label: 'Comprobante',
                         field: 'tipo.detalle_tc',
-                        //type: 'number',
                     },
                     {
                         label: 'Emisor',
                         field: this.fieldFn,
-
                     },
                     {
                         label: 'Valor',
@@ -204,7 +202,7 @@
             subir:function(){
                 if(this.archivo){
                     this.subiendo=true;
-                    servicios.comprobantes.store(this.archivo,this.cliente).then((response)=>{
+                    servicios.archivos.reporte(this.archivo,this.cliente).then((response)=>{
                         if(response.data.guardados>0)
                             this.consulta();
                         this.subiendo=false;
@@ -222,7 +220,7 @@
             subir2:function(){
                 if(this.archivo){
                     this.subiendo=true;
-                    servicios.comprobantes.store2(this.archivo,this.cliente).then((response)=>{
+                    servicios.archivos.xml(this.archivo,this.cliente).then((response)=>{
                         if(response.data.guardados>0)
                             this.consulta();
                         this.subiendo=false;
@@ -242,13 +240,6 @@
                 }
             }
         },
-        updated(){
-
-        },
-        mounted() {
-
-        }
-
     }
 </script>
 

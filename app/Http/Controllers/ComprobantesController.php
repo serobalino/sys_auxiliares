@@ -2,538 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Catalogos\Tabla17;
-use App\Catalogos\Tabla18;
-use App\Catalogos\Tabla19;
 use App\Cliente;
 use App\Comprobante;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use PHPExcel_Cell_DataType;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Illuminate\Database\QueryException;
 use Jenssegers\Date\Date;
-use SimpleXMLElement;
-use SoapClient;
-use stdClass;
+
 
 class ComprobantesController extends Controller
 {
-
-    private $impuestos  =   [];
-
-    private $letra      =   "H";
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store2(Request $request){
-        $validacion =   Validator::make($request->all(), [
-            'archivos'      => 'required|array',
-            'archivos.*'    => 'file|mimes:xml',
-            'cliente'       => 'required|exists:clientes,id_cl',
-        ]);
-        if($validacion->fails()){
-            $texto  =   '';
-            foreach ($validacion->errors()->all() as $errores)
-                $texto.=$errores.PHP_EOL;
-            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
-        }else{
-            set_time_limit ( 5*60);
-            $guardados=0;
-            $existentes=0;
-            $nopertenece=0;
-            $son=0;
-
-            $elegido    =   Cliente::find($request->cliente);
-
-            $files      =   $request->file('archivos');
-            foreach ($files as $item){
-                $xml    =   $this->parseXml(new SimpleXMLElement(file_get_contents($item)),$item);
-                $son++;
-                if($xml->val){
-                    if(strlen($xml->infoTributaria->claveAcceso)===49 && (int)$xml->infoTributaria->claveAcceso>0){
-                        $comprobante    = Comprobante::find($xml->infoTributaria->claveAcceso);
-                        if($comprobante){
-                            $existentes++;
-                        }else{
-                            if($elegido->dni_cl===$xml->id || $elegido->ruc_cl===$xml->id){
-                                unset($xml->val);
-                                unset($xml->id);
-                                $comprobante                =   new Comprobante();
-                                $comprobante->id_co         =   $xml->infoTributaria->claveAcceso;
-                                $comprobante->id_tc         =   (int) $xml->infoTributaria->codDoc;
-                                $comprobante->id_cl         =   $elegido->id_cl;
-                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$xml->info->fechaEmision)->format("Y-m-d");
-                                $comprobante->estado_co     =   true;
-                                $comprobante->comprobante   =   $xml;
-                                $comprobante->save();
-                                $guardados++;
-                            }else{
-                                $errores[]  = ["consulta"=>$xml,"comprobante"=>$xml->infoTributaria->claveAcceso,"mesanjes"=>"No existe cliente con $xml->id"];
-                                $nopertenece++;
-                            }
-
-                        }
-                    }else{
-                        $errores[]  = ["respuesta"=>$xml,"comprobante"=>$xml->infoTributaria->claveAcceso];
-                    }
-                }else{
-                    $errores[]  = ["respuesta"=>$xml->message];
-                }
-            }
-            return response([
-                "guardados"     =>  $guardados,
-                "existentes"    =>  $existentes,
-                "nopertenece"   =>  $nopertenece,
-                "son"           =>  $son,
-                "errores"       =>  @$errores ? $errores : 0,
-            ]);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request){
-        $validacion =   Validator::make($request->all(), [
-            'archivo'       => 'required|file|mimes:txt',
-            'cliente'       => 'required|exists:clientes,id_cl',
-        ]);
-        if($validacion->fails()){
-            $texto  =   '';
-            foreach ($validacion->errors()->all() as $errores)
-                $texto.=$errores.PHP_EOL;
-            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
-        }else{
-            set_time_limit ( 5*60);
-            $guardados=0;
-            $existentes=0;
-            $nopertenece=0;
-            $son=0;
-
-            $file       =   $request->file('archivo');
-            $archivo    =   file_get_contents($file);
-            $archivo    =   str_replace(PHP_EOL, ' ', $archivo);
-            $elementos  =   explode("	",$archivo);
-
-            $elegido    =   Cliente::find($request->cliente);
-            foreach ($elementos as $item){
-                if(strlen($item)===49 && (int)$item>0){
-                    $son++;
-                    $comprobante    = Comprobante::find($item);
-                    if($comprobante){
-                        $existentes++;
-                    }else{
-                        $sri                        =   $this->consultar($item);
-                        if($sri->val){
-                            if($elegido->dni_cl===$sri->id || $elegido->ruc_cl===$sri->id){
-                                unset($sri->val);
-                                unset($sri->id);
-                                $comprobante                =   new Comprobante();
-                                $comprobante->id_co         =   $item;
-                                $comprobante->id_tc         =   (int) $sri->infoTributaria->codDoc;
-                                $comprobante->id_cl         =   $elegido->id_cl;
-                                $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$sri->info->fechaEmision)->format("Y-m-d");
-                                $comprobante->estado_co     =   true;
-                                $comprobante->comprobante   =   $sri;
-                                $comprobante->save();
-                                $guardados++;
-                            }else{
-                                $errores[]  = ["consulta"=>$sri,"comprobante"=>$item,"mesanjes"=>"No existe cliente con $sri->id"];
-                                $nopertenece++;
-                            }
-                        }else{
-                            $errores[]  = ["respuesta"=>$sri,"comprobante"=>$item];
-                        }
-                    }
-                }
-            }
-            return response([
-                "guardados"     =>  $guardados,
-                "existentes"    =>  $existentes,
-                "nopertenece"   =>  $nopertenece,
-                "son"           =>  $son,
-                "errores"       =>  @$errores ? $errores : 0,
-            ]);
-        }
-    }
-
-    /**
-     * @param Request $request
      * @param $id
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @param null $desde
+     * @param null $hasta
+     * @param array $comprobantes
+     * @return Comprobante
      */
-    public function show(Request $request,$id)
-    {
-        $cliente    =   Cliente::find($id);
-        $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
-        $inicio     =   5;
-
-        $archivo    =   new Spreadsheet();
-        $archivo->getProperties()->setCreator('ASECONT - PUYO');
-        $archivo->getActiveSheet()->setCellValue('A1',$cliente->apellidos_cl." ".$cliente->nombres_cl);
-        $archivo->getActiveSheet()->setCellValue('A2',$cliente->razon_cl);
-        $archivo->getActiveSheet()->setCellValueExplicit('A3',$cliente->ruc_cl,PHPExcel_Cell_DataType::TYPE_STRING);
-        $archivo->getActiveSheet()->getRowDimension('1')->setRowHeight(22);
-        $archivo->getActiveSheet()->getRowDimension('2')->setRowHeight(20);
-        $archivo->getActiveSheet()->getRowDimension('3')->setRowHeight(18);
-        $archivo->getActiveSheet()->getStyle("A1")->getFont()->setBold(true);
-        $archivo->getActiveSheet()->getStyle("A2")->getFont()->setBold(true);
-        $archivo->getActiveSheet()->getStyle("A3")->getFont()->setBold(true);
-        //$archivo->getActiveSheet()->getStyle('A2:I2')->getFill()->setFillType();
-        $archivo->getActiveSheet()->getStyle('A1:A3')->getFill()->getStartColor()->setARGB('29bb04');
-        $titulos_sty = array(
-            'font'  => array(
-                'bold'  => true,
-                'color' => array('rgb' => '292542'),
-                'size'  => 13,
-                'name'  => 'Verdana'
-            ));
-        $archivo->getActiveSheet()->getStyle('A1')->applyFromArray($titulos_sty);
-        $archivo->getActiveSheet()->getStyle('A2')->applyFromArray($titulos_sty);
-        $archivo->getActiveSheet()->getStyle('A3')->applyFromArray($titulos_sty);
-        $archivo->getActiveSheet()->getStyle('A1:B3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $fila   =   $inicio;
-        $cont   =   0;
-        //auxiliares
-        $aux_ano    =   "";
-        $aux_mes    =   "";
-        $archivo->getActiveSheet()->setCellValue("A$fila","Num");
-        $archivo->getActiveSheet()->setCellValue("B$fila","Fecha");
-        $archivo->getActiveSheet()->setCellValue("C$fila","Clave de Acceso");
-        $archivo->getActiveSheet()->setCellValue("D$fila","RUC");
-        $archivo->getActiveSheet()->setCellValue("E$fila","Nombre Comercial");
-        $archivo->getActiveSheet()->setCellValue("F$fila","Detalle");
-        $archivo->getActiveSheet()->setCellValue("G$fila","Base Imponible");
-        $archivo->getActiveSheet()->setCellValue("H$fila","Descuento");
-
-        $fila++;
-        Date::setLocale('es');
-        $data   =   $this->consultaFecha($request->desde,$request->hasta,$id);
-        foreach ($data as $nivel){
-            //fecha
-            $fecha  =   Date::createFromFormat('Y-m-d',$nivel->fecha_co);
-            $ano    =   $fecha->format('Y');
-            $dia    =   $fecha->format('j');
-            $mes    =   $fecha->format('F');
-            $minMes =   mb_strtoupper(substr($mes, 0,3));
-            if($ano!==$aux_ano){
-                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-                $archivo->getActiveSheet()->setCellValue("A$fila",$ano);
-                $fila++;
-                $aux_ano=$ano;
-                $aux_mes=$mes;
-            }
-            if($mes!=$aux_mes){
-                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-                $fila++;
-                $aux_mes=$mes;
-                $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-            }
-
-            if(gettype($nivel->comprobante->detalles->detalle)==="array")
-                $producto="VARIOS PRODUCTOS";
-            else
-                $producto=mb_strtoupper($nivel->comprobante->detalles->detalle->descripcion);
-
-            $empresa=mb_strtoupper(@$nivel->comprobante->infoTributaria->nombreComercial);
-            if(!$empresa)
-                $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->razonSocial);
-            $cont++;
-            $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-            $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
-                ->setCellValue("B$fila","$minMes-$dia")
-                ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValue("E$fila",$empresa)
-                ->setCellValue("F$fila",$producto)
-                ->setCellValue("G$fila",$nivel->comprobante->info->totalSinImpuestos)
-                ->setCellValue("H$fila",$nivel->comprobante->info->totalDescuento>0 ? $nivel->comprobante->info->totalDescuento : '');
-
-            $archivo->getActiveSheet()->getStyle("G$fila")->getNumberFormat()->setFormatCode('0.00');
-            $archivo->getActiveSheet()->getStyle("H$fila")->getNumberFormat()->setFormatCode('0.00');
-
-            if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
-                foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
-                    if($impuesto->valor>0){
-                        $aux    =   $this->listaImpuestos($impuesto);
-                        $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->valor);
-                        $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
-                    }
-                }
-            }else{
-                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
-                    $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto);
-                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
-                    $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
-                }
-            }
-            $fila++;
+    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[1]){
+        if($desde!==null && $hasta===null){
+            return Comprobante::where("id_cl",$id)
+                ->orderBy("fecha_co","asc")
+                ->orderBy("id_tc","desc")
+                ->where('fecha_co','>=', $desde)
+                ->where('id_tc',$comprobantes)
+                ->get();
         }
-        //Aumenta una columna para el total
-        $this->letra++;
-
-        $archivo->getActiveSheet()->getStyle("A$inicio:$this->letra$inicio")->getAlignment()->setHorizontal('center');
-        //agrega el valor total de la factura
-        $fila   =   $inicio+1;
-        $aux_ano    =   "";
-        $aux_mes    =   "";
-        foreach ($data as $nivel){
-            $fecha  =   Date::createFromFormat('Y-m-d',$nivel->fecha_co);
-            $ano    =   $fecha->format('Y');
-            $mes    =   $fecha->format('F');
-            if($ano!==$aux_ano){
-                $fila++;
-                $aux_ano=$ano;
-                $aux_mes=$mes;
-            }
-            if($mes!=$aux_mes){
-                $fila++;
-                $aux_mes=$mes;
-            }
-            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,$nivel->comprobante->info->importeTotal);
-            $archivo->getActiveSheet()->getStyle($this->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
-            $fila++;
+        if ($desde===null && $hasta!==null){
+            return Comprobante::where("id_cl",$id)
+                ->orderBy("fecha_co","asc")
+                ->orderBy("id_tc","desc")
+                ->where('fecha_co','<=', $hasta)
+                ->where('id_tc',$comprobantes)
+                ->get();
         }
-
-        //Titulos en los impuestos
-        for ($i="I";$i<=$this->letra;$i++ ){
-            $array      =   collect($this->impuestos);
-            $resultado  =   $array->where('letra',$i)->first();
-            $archivo->getActiveSheet()->setCellValue($i.$inicio,@$resultado->por->detalle_t18);
-        }
-        //Titulo al final
-        $archivo->getActiveSheet()->setCellValue($this->letra.$inicio,"Total");
-
-        //Ajuta el tamaño de la celda para todas las columnas usadas
-        for ($i="A";$i<=$this->letra;$i++ ){
-            $archivo->getActiveSheet()->getColumnDimension($i)->setAutoSize(true);
-        }
-
-        //Combinar celdas
-        $archivo->getActiveSheet()->mergeCells("A1:".$this->letra."1");
-        $archivo->getActiveSheet()->mergeCells("A2:".$this->letra."2");
-        $archivo->getActiveSheet()->mergeCells("A3:".$this->letra."3");
-
-        $actual =   now();
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header("Content-Disposition: attachment;filename=$nomArchivo.xlsx");
-        header('Cache-Control: max-age=0');
-        header("nombre: $nomArchivo $actual.xlsx");
-        $salida = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($archivo, 'Xlsx');
-        $salida->save('php://output');
-        exit;
-    }
-
-    private function listaImpuestos($impuesto){
-        $array      =   collect($this->impuestos);
-        $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->first();
-        if($resultado){
-            return (object)$resultado;
-        }else{
-            $this->letra++;
-            $obj    =   [
-                'letra'=>$this->letra,
-                'codigo'=>$impuesto->codigo,
-                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
-                'tarifa'=>@$impuesto->tarifa,
-                'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigo) ? Tabla18::find($impuesto->codigo) : Tabla19::find($impuesto->codigo)
-            ];
-            $obj    =   (object)$obj;
-            $array->push($obj);
-            $this->impuestos=$array;
-            return $obj;
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        $validacion =   Validator::make($request->all(), [
-            'desde' => 'nullable|date',
-            'hasta' => 'nullable|date|after:desde',
-        ]);
-        if($validacion->fails()){
-            $texto  =   '';
-            foreach ($validacion->errors()->all() as $errores)
-                $texto.=$errores.PHP_EOL;
-            return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
-        }else{
-            $lista = $this->consultaFecha($request->desde,$request->hasta,$id);
-            return response($lista);
-        }
-    }
-
-    private function consultaFecha($desde,$hasta,$id){
-        if($desde || $hasta){
+        if ($desde!==null && $hasta!==null){
             return Comprobante::where("id_cl",$id)
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
                 ->whereBetween('fecha_co', [$desde, $hasta])
-                ->where('id_tc',1)
-                ->get();
-        }else{
-            return Comprobante::where("id_cl",$id)
-                ->orderBy("fecha_co","asc")
-                ->orderBy("id_tc","desc")
-                ->where('id_tc',1)
+                ->where('id_tc',$comprobantes)
                 ->get();
         }
+        return Comprobante::where("id_cl",$id)
+            ->orderBy("fecha_co","asc")
+            ->orderBy("id_tc","desc")
+            ->where('id_tc',$comprobantes)
+            ->get();
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $clave
+     * @param Cliente $cliente
+     * @param $objeto
+     * @return bool
      */
-    public function destroy($id)
-    {
-        //
-    }
-
-
-    /**
-     *
-    ***/
-    public function consultar($claveAceso){
-        $opts=array(
-            'http'=>array(
-                'user_agent'=>'PHPSoapClient'
-            )
-        );
-        $context=stream_context_create($opts);
-        $soapClientOptions=array(
-            'stream_context'=>$context,
-            'cache_wsdl'=>WSDL_CACHE_NONE
-        );
-        $url="https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantes?wsdl";
-        try {
-            $client = new SoapClient($url, $soapClientOptions);
-            return $this->parseXml($client->autorizacionComprobante(['claveAccesoComprobante'=>$claveAceso]));
-        } catch (\Exception $e) {
-            $aux            =   new stdClass();
-            $aux->val       =   false;
-            $aux->message   =   "No existe el comprobante en la base de datos del SRI";
-            return $aux;
-        }
-
-    }
-    private function enlinea($xml){
-        return simplexml_load_string($xml->RespuestaAutorizacionComprobante->autorizaciones->autorizacion->comprobante);
-    }
-
-    private function offlinea($xml){
-        return simplexml_load_string($xml->comprobante);
-    }
-
-    private function parseXml($aux,$archivo=null){
-        try {
-            try{
-                $aux=$this->enlinea($aux);
-            }catch (\Exception $e) {
-                $aux=$this->offlinea($aux);
-            }
-            $json=json_decode(json_encode($aux));
-            switch ((int)$json->infoTributaria->codDoc) {
-                case 1://factura
-                    $json->val=true;
-                    $json->info=$json->infoFactura;
-                    $json->id=$json->info->identificacionComprador;
-                    unset($json->infoFactura);
-                    break;
-                case 2://nota de venta
-                    $json->val=false;
-                    $json->info=$json->infoNotaVenta;
-                    unset($json->infoNotaVenta);
-                    break;
-                case 3://liquidacion de compra
-                    $json->val=false;
-                    $json->info=$json->infoFactura;
-                    unset($json->infoFactura);
-                    break;
-                case 4://nota de credito
-                    $json->val=true;
-                    $json->id=$json->infoNotaCredito->identificacionComprador;
-                    $json->info=$json->infoNotaCredito;
-                    unset($json->infoNotaCredito);
-                    break;
-                case 5://nota de debito
-                    $json->val=true;
-                    $json->id=$json->infoNotaDebito->identificacionComprador;
-                    $json->info=$json->infoNotaDebito;
-                    unset($json->infoNotaDebito);
-                    break;
-                case 6://guia de remision
-                    $json->val=false;
-                    $json->info=$json->infoFactura;
-                    unset($json->infoFactura);
-                    break;
-                case 7://comprobante de retencion
-                    $json->val=true;
-                    $json->info=$json->infoCompRetencion;
-                    $json->id=$json->infoCompRetencion->identificacionSujetoRetenido;
-                    unset($json->infoCompRetencion);
-                    break;
-                case 8://entradas a espectaculos
-                    $json->val=false;
-                    $json->info=$json->infoFactura;
-                    unset($json->infoFactura);
-                    break;
-                default:
-                    $json->val=false;
-                    break;
-            }
-            return $json;
-        } catch (\Exception $e) {
-            $nombre    =   @$archivo->getClientOriginalName();
-            return (object)['val'=>false,'message'=>"Error en la estructura del Comprobante Electrónico $nombre"];
+    public function guardar($clave,Cliente $cliente,$objeto){
+        try{
+            $comprobante                =   new Comprobante();
+            $comprobante->id_co         =   $clave;
+            $comprobante->id_tc         =   (int) $objeto->infoTributaria->codDoc;
+            $comprobante->id_cl         =   $cliente->id_cl;
+            $comprobante->fecha_co      =   Date::createFromFormat('d/m/Y',$objeto->info->fechaEmision)->format("Y-m-d");
+            $comprobante->estado_co     =   true;
+            $comprobante->comprobante   =   $objeto;
+            $comprobante->save();
+            return true;
+        } catch (QueryException $e){
+            return false;
         }
     }
 }

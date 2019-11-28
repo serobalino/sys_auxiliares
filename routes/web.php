@@ -22,7 +22,11 @@ Route::middleware('verified')->group(function () {
 
     Route::prefix('app')->group(function () {
         Route::resource("clientes","ClientesController");
-        Route::resource("comprobantes","ComprobantesController");
-        Route::post("comprobantes2","ComprobantesController@store2");
+        Route::resource("comprobantes","GenerarAnexoController");
+
+        Route::prefix('archivos')->group(function () {
+            Route::post("reporte","SubirController@reporte");
+            Route::post("comprobante","SubirController@comprobante");
+        });
     });
 });
