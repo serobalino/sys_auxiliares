@@ -19,9 +19,12 @@ class GenerarAnexoController extends Controller
 {
     protected $comprobantes;
 
-    public function __construct(ComprobantesController $comprobantes)
+    protected $registro;
+
+    public function __construct(ComprobantesController $comprobantes,HistorialController $registro)
     {
-        $this->comprobantes = $comprobantes;
+        $this->comprobantes =   $comprobantes;
+        $this->registro     =   $registro;
     }
 
 
@@ -33,7 +36,7 @@ class GenerarAnexoController extends Controller
     /**
      * @var string
      */
-    private $letra      =   "H";
+    private $letra      =   "K";
 
     /**
      * @param $impuesto
@@ -135,11 +138,14 @@ class GenerarAnexoController extends Controller
         $archivo->getActiveSheet()->setCellValue("A$fila","Num");
         $archivo->getActiveSheet()->setCellValue("B$fila","Fecha");
         $archivo->getActiveSheet()->setCellValue("C$fila","Clave de Acceso");
-        $archivo->getActiveSheet()->setCellValue("D$fila","RUC");
-        $archivo->getActiveSheet()->setCellValue("E$fila","Nombre Comercial");
-        $archivo->getActiveSheet()->setCellValue("F$fila","Detalle");
-        $archivo->getActiveSheet()->setCellValue("G$fila","Base Imponible");
-        $archivo->getActiveSheet()->setCellValue("H$fila","Descuento");
+        $archivo->getActiveSheet()->setCellValue("D$fila","Estb.");
+        $archivo->getActiveSheet()->setCellValue("E$fila","P.Emi.");
+        $archivo->getActiveSheet()->setCellValue("F$fila","Secuencial");
+        $archivo->getActiveSheet()->setCellValue("G$fila","RUC");
+        $archivo->getActiveSheet()->setCellValue("H$fila","Nombre Comercial");
+        $archivo->getActiveSheet()->setCellValue("I$fila","Detalle");
+        $archivo->getActiveSheet()->setCellValue("J$fila","Base Imponible");
+        $archivo->getActiveSheet()->setCellValue("K$fila","Descuento");
 
         $fila++;
         Date::setLocale('es');
@@ -178,11 +184,14 @@ class GenerarAnexoController extends Controller
             $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
                 ->setCellValue("B$fila","$minMes-$dia")
                 ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValue("E$fila",$empresa)
-                ->setCellValue("F$fila",$producto)
-                ->setCellValue("G$fila",$nivel->comprobante->info->totalSinImpuestos)
-                ->setCellValue("H$fila",$nivel->comprobante->info->totalDescuento>0 ? $nivel->comprobante->info->totalDescuento : '');
+                ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                ->setCellValue("H$fila",$empresa)
+                ->setCellValue("I$fila",$producto)
+                ->setCellValue("J$fila",$nivel->comprobante->info->totalSinImpuestos)
+                ->setCellValue("K$fila",$nivel->comprobante->info->totalDescuento>0 ? $nivel->comprobante->info->totalDescuento : '');
 
             $archivo->getActiveSheet()->getStyle("G$fila")->getNumberFormat()->setFormatCode('0.00');
             $archivo->getActiveSheet()->getStyle("H$fila")->getNumberFormat()->setFormatCode('0.00');
@@ -250,6 +259,10 @@ class GenerarAnexoController extends Controller
         $archivo->getActiveSheet()->mergeCells("A3:".$this->letra."3");
 
         $actual =   now();
+
+        //log
+        $this->registro->log(auth()->user(),$cliente,"Generacion de Excel con comprobantes",$request);
+
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment;filename=$nomArchivo.xlsx");
