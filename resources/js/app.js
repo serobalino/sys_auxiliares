@@ -10,6 +10,10 @@ window.Vue = require('vue');
 
 import BootstrapVue from 'bootstrap-vue';
 import VueIziToast from "vue-izitoast";
+import VeeValidate from 'vee-validate';
+import es from 'vee-validate/dist/locale/es';
+
+
 
 
 
@@ -33,6 +37,12 @@ files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(
 
 Vue.use(BootstrapVue);
 Vue.use(VueIziToast);
+Vue.use(VeeValidate, {
+    locale: 'es',
+    dictionary: {
+        es: es
+    }
+});
 
 const app = new Vue({
     el: '#app',
