@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <b-form-file accept=".xml" browse-text="Examinar" v-model="archivo" :disabled="subiendo" multiple placeholder="Elija varios archivos"></b-form-file>
+            <b-form-file accept=".xml" browse-text="Examinar" :file-name-formatter="formatNames" v-model="archivo"  :disabled="subiendo" multiple placeholder="Elija varios archivos"></b-form-file>
             <div class="text-center mt-3">
                 <button class="btn btn-info" v-on:click="subir2" :disabled="subiendo">Subir</button>
                 <button class="btn btn-danger" v-on:click="ocultarModal" :disabled="subiendo"  >Cancelar</button>
@@ -169,6 +169,13 @@
             }
         },
         methods:{
+            formatNames(files) {
+                if (files.length === 1) {
+                    return files[0].name
+                } else {
+                    return `${files.length} archivos selecionados`
+                }
+            },
             ocultarModal:function(){
                 this.$root.$emit('bv::hide::modal', 'resumen', '#btnShow');
                 this.$root.$emit('bv::hide::modal', 'resumen2', '#btnShow');
