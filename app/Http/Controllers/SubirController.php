@@ -212,7 +212,7 @@ class SubirController extends Controller
                             $this->comprobantes->guardar($xml->infoTributaria->claveAcceso,$elegido,$xml);
                             $guardados++;
                         }else{
-                            $errores[]  = ["consulta"=>$xml,"comprobante"=>$xml->infoTributaria->claveAcceso,"mesanjes"=>"No existe cliente con $xml->id"];
+                            $errores[]  = ["comprobante"=>$xml->infoTributaria->claveAcceso,"mesanjes"=>"No le pertenece el comprobante emitido para $xml->id"];
                             $nopertenece++;
                         }
 
