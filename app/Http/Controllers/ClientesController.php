@@ -50,11 +50,11 @@ class ClientesController extends Controller
             return response(['val'=>false,'message'=>$texto,'datos'=>$validacion->errors()->all()],500);
         }else{
             $nuevo                  =   new Cliente();
-            $nuevo->nombres_cl      =   $request->nombres;
-            $nuevo->apellidos_cl    =   $request->apellidos;
+            $nuevo->nombres_cl      =   mb_strtoupper($request->nombres, 'UTF-8');
+            $nuevo->apellidos_cl    =   mb_strtoupper($request->apellidos, 'UTF-8');
             $nuevo->dni_cl          =   $request->dni;
             $nuevo->ruc_cl          =   $request->ruc;
-            $nuevo->razon_cl        =   $request->razon;
+            $nuevo->razon_cl        =   mb_strtoupper($request->razon, 'UTF-8');
             $nuevo->save();
             return response(['val'=>true,'mensaje'=>"Se guardó Correctamente $nuevo->apellidos_cl $nuevo->nombres_cl"]);
         }
