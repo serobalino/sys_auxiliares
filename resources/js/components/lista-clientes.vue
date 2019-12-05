@@ -95,11 +95,7 @@
 </template>
 
 <script>
-    import VeeValidate, { Validator } from 'vee-validate';
-    import es from 'vee-validate/dist/locale/es';
-    Validator.localize('es', es);
     import * as servicios from "../servicios";
-    Vue.use(VeeValidate);
     export default {
         name: "lista-clientes",
         data:()=>({
@@ -161,6 +157,7 @@
                                 ruc:null,
                                 dni:null
                             };
+                            this.$bvModal.hide("nuevo");
                         }).catch((error)=>{
                             this.estado.id=3;
                             this.estado.disabled=false;
