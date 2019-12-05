@@ -104,6 +104,8 @@ class GenerarAnexoController extends Controller
     public function show(RangoRequest $request,$id){
         $cliente    =   Cliente::find($id);
         $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
+        $nomArchivo =   str_replace(' ', '-', $nomArchivo);
+        $nomArchivo =    preg_replace('/[^A-Za-z0-9\-]/', '', $nomArchivo);
         $inicio     =   5;
 
         $archivo    =   new Spreadsheet();
@@ -240,7 +242,7 @@ class GenerarAnexoController extends Controller
         }
 
         //Titulos en los impuestos
-        for ($i="I";$i<=$this->letra;$i++ ){
+        for ($i="L";$i<=$this->letra;$i++ ){
             $array      =   collect($this->impuestos);
             $resultado  =   $array->where('letra',$i)->first();
             $archivo->getActiveSheet()->setCellValue($i.$inicio,@$resultado->por->detalle_t18);
