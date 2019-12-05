@@ -105,10 +105,7 @@
 <script>
     import { VueGoodTable } from 'vue-good-table';
     import { Datetime } from 'vue-datetime';
-    import { Settings } from 'luxon';
     import * as servicios from "../servicios";
-    Settings.defaultLocale = 'es';
-    Vue.use(Datetime);
     export default {
         name: "lista-comprobantes",
         props:{
