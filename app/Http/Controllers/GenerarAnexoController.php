@@ -9,6 +9,7 @@ use App\Cliente;
 use App\Comprobante;
 use App\Http\Requests\Comprobantes\Lista\RangoRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Jenssegers\Date\Date;
 use PHPExcel_Cell_DataType;
@@ -55,7 +56,7 @@ class GenerarAnexoController extends Controller
                 'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
                 'tarifa'=>@$impuesto->tarifa,
                 'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigo) ? Tabla18::find($impuesto->codigo) : Tabla19::find($impuesto->codigo)
+                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje)
             ];
             $obj    =   (object)$obj;
             $array->push($obj);
@@ -245,7 +246,8 @@ class GenerarAnexoController extends Controller
         for ($i="L";$i<=$this->letra;$i++ ){
             $array      =   collect($this->impuestos);
             $resultado  =   $array->where('letra',$i)->first();
-            $archivo->getActiveSheet()->setCellValue($i.$inicio,@$resultado->por->detalle_t18);
+            if($resultado)
+            $archivo->getActiveSheet()->setCellValue($i.$inicio,$resultado->por->detalle_t18." ".$resultado->imp->impuesto_t17);
         }
         //Titulo al final
         $archivo->getActiveSheet()->setCellValue($this->letra.$inicio,"Total");
@@ -261,6 +263,8 @@ class GenerarAnexoController extends Controller
         $archivo->getActiveSheet()->mergeCells("A3:".$this->letra."3");
 
         $actual =   now();
+
+        Log::info($this->impuestos);
 
         //log
         $this->registro->log(auth()->user(),$cliente,"Generacion de Excel con comprobantes",$request);
