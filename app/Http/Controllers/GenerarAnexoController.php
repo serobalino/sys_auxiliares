@@ -264,8 +264,6 @@ class GenerarAnexoController extends Controller
 
         $actual =   now();
 
-        Log::info($this->impuestos);
-
         //log
         $this->registro->log(auth()->user(),$cliente,"Generacion de Excel con comprobantes",$request);
 
