@@ -201,16 +201,16 @@ class GenerarAnexoController extends Controller
 
             if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
                 foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
-                    if($impuesto->valor>0){
+                    if($impuesto->baseImponible>0){
                         $aux    =   $this->listaImpuestos($impuesto);
-                        $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->valor);
+                        $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
                         $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                     }
                 }
             }else{
-                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
+                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
                     $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto);
-                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
                     $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                 }
             }
