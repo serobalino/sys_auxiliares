@@ -37,31 +37,46 @@ class GenerarAnexoController extends Controller
     /**
      * @var string
      */
-    private $letra      =   "K";
+    private $letra      =   "I";
 
     /**
      * @param $impuesto
      * @return object
      */
-    private function listaImpuestos($impuesto){
+    private function listaImpuestos($impuesto,$bandera){
         $array      =   collect($this->impuestos);
-        $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->first();
+        $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->where('base',$bandera)->first();
         if($resultado){
             return (object)$resultado;
         }else{
             $this->letra++;
-            $obj    =   [
+            $obj1    =   [
                 'letra'=>$this->letra,
                 'codigo'=>$impuesto->codigo,
                 'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
                 'tarifa'=>@$impuesto->tarifa,
                 'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje)
+                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
+                'base'=>false,
             ];
-            $obj    =   (object)$obj;
-            $array->push($obj);
+            $obj1    =   (object)$obj1;
+            $array->push($obj1);
+            $this->letra++;
+
+            $obj2    =   [
+                'letra'=>$this->letra,
+                'codigo'=>$impuesto->codigo,
+                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
+                'tarifa'=>@$impuesto->tarifa,
+                'imp'=>Tabla17::find($impuesto->codigo),
+                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
+                'base'=>true,
+            ];
+            $obj2    =   (object)$obj2;
+
+            $array->push($obj2);
             $this->impuestos=$array;
-            return $obj;
+            return $bandera ? $obj2 : $obj1;
         }
     }
 
@@ -147,8 +162,6 @@ class GenerarAnexoController extends Controller
         $archivo->getActiveSheet()->setCellValue("G$fila","RUC");
         $archivo->getActiveSheet()->setCellValue("H$fila","Nombre Comercial");
         $archivo->getActiveSheet()->setCellValue("I$fila","Detalle");
-        $archivo->getActiveSheet()->setCellValue("J$fila","Base Imponible");
-        $archivo->getActiveSheet()->setCellValue("K$fila","Descuento");
 
         $fila++;
         Date::setLocale('es');
@@ -192,9 +205,7 @@ class GenerarAnexoController extends Controller
                 ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
                 ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
                 ->setCellValue("H$fila",$empresa)
-                ->setCellValue("I$fila",$producto)
-                ->setCellValue("J$fila",$nivel->comprobante->info->totalSinImpuestos)
-                ->setCellValue("K$fila",$nivel->comprobante->info->totalDescuento>0 ? $nivel->comprobante->info->totalDescuento : '');
+                ->setCellValue("I$fila",$producto);
 
             $archivo->getActiveSheet()->getStyle("G$fila")->getNumberFormat()->setFormatCode('0.00');
             $archivo->getActiveSheet()->getStyle("H$fila")->getNumberFormat()->setFormatCode('0.00');
@@ -202,16 +213,26 @@ class GenerarAnexoController extends Controller
             if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
                 foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
                     if($impuesto->baseImponible>0){
-                        $aux    =   $this->listaImpuestos($impuesto);
+                        $aux    =   $this->listaImpuestos($impuesto,true);
                         $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
                         $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                    }
+                    if($impuesto->valor>0){
+                        $aux2    =   $this->listaImpuestos($impuesto,false);
+                        $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                        $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                     }
                 }
             }else{
                 if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
-                    $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto);
+                    $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true);
                     $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
                     $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                }
+                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
+                    $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false);
+                    $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                    $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                 }
             }
             $fila++;
@@ -243,11 +264,16 @@ class GenerarAnexoController extends Controller
         }
 
         //Titulos en los impuestos
-        for ($i="L";$i<=$this->letra;$i++ ){
+        for ($i="J";$i<=$this->letra;$i++ ){
             $array      =   collect($this->impuestos);
             $resultado  =   $array->where('letra',$i)->first();
-            if($resultado)
-            $archivo->getActiveSheet()->setCellValue($i.$inicio,$resultado->por->detalle_t18." ".$resultado->imp->impuesto_t17);
+            if($resultado){
+                if($resultado->base){
+                    $archivo->getActiveSheet()->setCellValue($i.$inicio,"B.I. ".$resultado->por->label." ".$resultado->imp->impuesto_t17);
+                }else{
+                    $archivo->getActiveSheet()->setCellValue($i.$inicio,$resultado->por->label." ".$resultado->imp->impuesto_t17);
+                }
+            }
         }
         //Titulo al final
         $archivo->getActiveSheet()->setCellValue($this->letra.$inicio,"Total");
@@ -264,6 +290,8 @@ class GenerarAnexoController extends Controller
 
         $actual =   now();
 
+
+        Log::info($this->impuestos);
         //log
         $this->registro->log(auth()->user(),$cliente,"Generacion de Excel con comprobantes",$request);
 

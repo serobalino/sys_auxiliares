@@ -97,7 +97,11 @@
                         enabled: true,
                         initialSortBy: {field: 'fecha_co', type: 'asc'}
                       }"
+                    @on-row-click="verDetalles"
             />
+            <b-modal hide-footer centered id="comprobante" size="xl" title="Comprobante">
+                <modal-comprobante :datos="detalle"></modal-comprobante>
+            </b-modal>
         </div>
     </div>
 </template>
@@ -163,9 +167,16 @@
                     texto:null,
                 },
                 excel:false,
+                detalle:{
+                    comprobante:{}
+                }
             }
         },
         methods:{
+            verDetalles(data){
+                this.$root.$emit('bv::show::modal', 'comprobante');
+                this.detalle=data.row;
+            },
             formatNames(files) {
                 if (files.length === 1) {
                     return files[0].name
