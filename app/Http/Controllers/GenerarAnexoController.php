@@ -50,6 +50,19 @@ class GenerarAnexoController extends Controller
             return (object)$resultado;
         }else{
             $this->letra++;
+            $obj2    =   [
+                'letra'=>$this->letra,
+                'codigo'=>$impuesto->codigo,
+                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
+                'tarifa'=>@$impuesto->tarifa,
+                'imp'=>Tabla17::find($impuesto->codigo),
+                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
+                'base'=>true,
+            ];
+            $obj2    =   (object)$obj2;
+            $array->push($obj2);
+
+            $this->letra++;
             $obj1    =   [
                 'letra'=>$this->letra,
                 'codigo'=>$impuesto->codigo,
@@ -61,20 +74,7 @@ class GenerarAnexoController extends Controller
             ];
             $obj1    =   (object)$obj1;
             $array->push($obj1);
-            $this->letra++;
 
-            $obj2    =   [
-                'letra'=>$this->letra,
-                'codigo'=>$impuesto->codigo,
-                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
-                'tarifa'=>@$impuesto->tarifa,
-                'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
-                'base'=>true,
-            ];
-            $obj2    =   (object)$obj2;
-
-            $array->push($obj2);
             $this->impuestos=$array;
             return $bandera ? $obj2 : $obj1;
         }
