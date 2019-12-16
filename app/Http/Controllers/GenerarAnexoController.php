@@ -192,9 +192,14 @@ class GenerarAnexoController extends Controller
             else
                 $producto=mb_strtoupper($nivel->comprobante->detalles->detalle->descripcion);
 
-            $empresa=mb_strtoupper(@$nivel->comprobante->infoTributaria->nombreComercial);
-            if(!$empresa)
+
+
+            try {
+                $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->nombreComercial);
+            } catch (\Exception $e) {
                 $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->razonSocial);
+            }
+
             $cont++;
             $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
             $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
