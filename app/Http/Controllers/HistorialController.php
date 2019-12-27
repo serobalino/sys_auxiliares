@@ -14,9 +14,9 @@ class HistorialController extends Controller
      * @param User $usuario
      * @param Cliente $cliente
      * @param string $texto
-     * @param Request $solicitud
+     * @param string $solicitud
      */
-    public function log(User $usuario,Cliente $cliente,string $texto,Request $solicitud){
+    public function log(User $usuario,Cliente $cliente,string $texto,$solicitud){
         $nuevo                  =   new Historial();
         $nuevo->solicitud_hi    =   $solicitud;
         $nuevo->us_hi           =   $usuario->id;
