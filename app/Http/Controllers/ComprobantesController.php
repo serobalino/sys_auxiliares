@@ -10,6 +10,12 @@ use Jenssegers\Date\Date;
 
 class ComprobantesController extends Controller
 {
+    protected $registro;
+
+    public function __construct(HistorialController $registro)
+    {
+        $this->registro     =   $registro;
+    }
     /**
      * @param $id
      * @param null $desde
@@ -17,7 +23,7 @@ class ComprobantesController extends Controller
      * @param array $comprobantes
      * @return Comprobante
      */
-    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[1]){
+    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[7]){
         if($desde!==null && $hasta===null){
             return Comprobante::where("id_cl",$id)
                 ->orderBy("fecha_co","asc")
@@ -65,6 +71,7 @@ class ComprobantesController extends Controller
             $comprobante->estado_co     =   true;
             $comprobante->comprobante   =   $objeto;
             $comprobante->save();
+            $this->registro->log(auth()->user(),$cliente,"Comprobante Subído",$clave);
             return true;
         } catch (QueryException $e){
             return false;
