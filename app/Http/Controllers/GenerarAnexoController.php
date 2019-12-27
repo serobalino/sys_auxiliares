@@ -5,16 +5,13 @@ namespace App\Http\Controllers;
 use App\Catalogos\Tabla17;
 use App\Catalogos\Tabla18;
 use App\Catalogos\Tabla19;
+use App\Catalogos\Tabla20;
 use App\Cliente;
-use App\Comprobante;
 use App\Http\Requests\Comprobantes\Lista\RangoRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Jenssegers\Date\Date;
 use PHPExcel_Cell_DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use App\Http\Controllers\ComprobantesController;
 
 class GenerarAnexoController extends Controller
 {
@@ -41,39 +38,117 @@ class GenerarAnexoController extends Controller
 
     /**
      * @param $impuesto
+     * @param $bandera
+     * @param int $comprobante
      * @return object
      */
-    private function listaImpuestos($impuesto,$bandera){
+    private function listaImpuestos($impuesto,bool $bandera,int $comprobante){
         $array      =   collect($this->impuestos);
-        $resultado  =   $array->where('codigo',$impuesto->codigo)->where('codigoPorcentaje',$impuesto->codigoPorcentaje)->where('base',$bandera)->first();
+        switch ($comprobante) {
+            case 1://factura
+                $resultado  =   $array->where('codigo1',$impuesto->codigo)
+                    ->where('codigo2',$impuesto->codigoPorcentaje)
+                    ->where('base',$bandera)
+                    ->where('id_tc',$comprobante)
+                    ->first();
+                break;
+            case 2://nota de venta
+                break;
+            case 3://liquidacion de compra
+                break;
+            case 4://nota de credito
+                break;
+            case 5://nota de debito
+                break;
+            case 6://guia de remision
+                break;
+            case 7://comprobante de retencion
+                $resultado  =   $array->where('codigo1',$impuesto->codigo)
+                    ->where('codigo2',$impuesto->codigoRetencion)
+                    ->where('base',$bandera)
+                    ->where('id_tc',$comprobante)
+                    ->first();
+                break;
+            case 8://entradas a espectaculos
+                break;
+            default:
+                break;
+        }
+
+
         if($resultado){
             return (object)$resultado;
         }else{
-            $this->letra++;
-            $obj2    =   [
-                'letra'=>$this->letra,
-                'codigo'=>$impuesto->codigo,
-                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
-                'tarifa'=>@$impuesto->tarifa,
-                'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
-                'base'=>true,
-            ];
-            $obj2    =   (object)$obj2;
-            $array->push($obj2);
+            switch ($comprobante) {
+                case 1://factura
+                    $this->letra++;
+                    $obj2    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoPorcentaje,
+                        'imp1'=>Tabla17::find($impuesto->codigo),
+                        'imp2'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
+                        'base'=>true,
+                        'id_tc'=>$comprobante
+                    ];
+                    $obj2    =   (object)$obj2;
+                    $array->push($obj2);
 
-            $this->letra++;
-            $obj1    =   [
-                'letra'=>$this->letra,
-                'codigo'=>$impuesto->codigo,
-                'codigoPorcentaje'=>$impuesto->codigoPorcentaje,
-                'tarifa'=>@$impuesto->tarifa,
-                'imp'=>Tabla17::find($impuesto->codigo),
-                'por'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
-                'base'=>false,
-            ];
-            $obj1    =   (object)$obj1;
-            $array->push($obj1);
+                    $this->letra++;
+                    $obj1    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoPorcentaje,
+                        'imp1'=>$obj2->imp1,
+                        'imp2'=>$obj2->imp2,
+                        'base'=>!$obj2->base,
+                        'id_tc'=>$comprobante
+                    ];
+                    $obj1    =   (object)$obj1;
+                    $array->push($obj1);
+                    break;
+                case 2://nota de venta
+                    break;
+                case 3://liquidacion de compra
+                    break;
+                case 4://nota de credito
+                    break;
+                case 5://nota de debito
+                    break;
+                case 6://guia de remision
+                    break;
+                case 7://comprobante de retencion
+                    $this->letra++;
+                    $obj2    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoRetencion,
+                        'imp1'=>Tabla17::find($impuesto->codigo),
+                        'imp2'=>Tabla20::find($impuesto->codigoRetencion),
+                        'base'=>true,
+                        'id_tc'=>$comprobante
+                    ];
+                    $obj2    =   (object)$obj2;
+                    $array->push($obj2);
+
+                    $this->letra++;
+                    $obj1    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoRetencion,
+                        'imp1'=>$obj2->imp1,
+                        'imp2'=>$obj2->imp2,
+                        'base'=>!$obj2->base,
+                        'id_tc'=>$comprobante
+                    ];
+                    $obj1    =   (object)$obj1;
+                    $array->push($obj1);
+                    break;
+                case 8://entradas a espectaculos
+                    break;
+                default:
+                    break;
+            }
 
             $this->impuestos=$array;
             return $bandera ? $obj2 : $obj1;
@@ -186,59 +261,111 @@ class GenerarAnexoController extends Controller
                 $aux_mes=$mes;
                 $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
             }
-
-            if(gettype($nivel->comprobante->detalles->detalle)==="array")
-                $producto="VARIOS PRODUCTOS";
-            else
-                $producto=mb_strtoupper($nivel->comprobante->detalles->detalle->descripcion);
-
-
-
             try {
                 $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->nombreComercial);
             } catch (\Exception $e) {
                 $empresa=mb_strtoupper($nivel->comprobante->infoTributaria->razonSocial);
             }
-
             $cont++;
             $archivo->getActiveSheet()->insertNewRowBefore($fila,1);
-            $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
-                ->setCellValue("B$fila","$minMes-$dia")
-                ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
-                ->setCellValue("H$fila",$empresa)
-                ->setCellValue("I$fila",$producto);
+            switch ($nivel->id_tc){
+                case 1://Factura
+                    if(gettype($nivel->comprobante->detalles->detalle)==="array")
+                        $producto="VARIOS PRODUCTOS";
+                    else
+                        $producto=mb_strtoupper($nivel->comprobante->detalles->detalle->descripcion);
 
-            $archivo->getActiveSheet()->getStyle("G$fila")->getNumberFormat()->setFormatCode('0.00');
-            $archivo->getActiveSheet()->getStyle("H$fila")->getNumberFormat()->setFormatCode('0.00');
+                    $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
+                        ->setCellValue("B$fila","$minMes-$dia")
+                        ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValue("H$fila",$empresa)
+                        ->setCellValue("I$fila",$producto);
 
-            if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
-                foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
-                    if($impuesto->baseImponible>0){
-                        $aux    =   $this->listaImpuestos($impuesto,true);
-                        $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
-                        $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                    if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
+                        foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
+                            if($impuesto->baseImponible>0){
+                                $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                            if($impuesto->valor>0){
+                                $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                                $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                        }
+                    }else{
+                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
+                            $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
+                            $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
+                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
+                            $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                            $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
                     }
-                    if($impuesto->valor>0){
-                        $aux2    =   $this->listaImpuestos($impuesto,false);
-                        $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
-                        $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+
+                    break;
+                case 2://nota de venta
+                    break;
+                case 3://liquidacion de compra
+                    break;
+                case 4://nota de credito
+
+                    break;
+                case 5://nota de debito
+
+                    break;
+                case 6://guia de remision
+                    break;
+                case 7://comprobante de retencion
+                    $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
+                        ->setCellValue("B$fila","$minMes-$dia")
+                        ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValue("H$fila",$empresa)
+                        ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc, 'UTF-8'));
+
+                    if(gettype($nivel->comprobante->impuestos)==="array"){
+                        foreach ($nivel->comprobante->impuestos as $impuesto){
+                            if($impuesto->baseImponible>0){
+                                $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                            if($impuesto->valorRetenido>0){
+                                $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valorRetenido);
+                                $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                        }
+                    }else{
+                        if($nivel->comprobante->impuestos->impuesto->baseImponible>0){
+                            $aux    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,true,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->impuestos->impuesto->baseImponible);
+                            $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
+                        if($nivel->comprobante->impuestos->impuesto->valorRetenido>0){
+                            $aux2    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,false,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->impuestos->impuesto->valorRetenido);
+                            $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
                     }
-                }
-            }else{
-                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
-                    $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true);
-                    $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
-                    $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
-                }
-                if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
-                    $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false);
-                    $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
-                    $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
-                }
+
+                    break;
+                case 8://entradas a espectaculos
+                    break;
+                default:
+                    break;
             }
             $fila++;
         }
@@ -263,7 +390,7 @@ class GenerarAnexoController extends Controller
                 $fila++;
                 $aux_mes=$mes;
             }
-            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,$nivel->comprobante->info->importeTotal);
+            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,$nivel->valor);
             $archivo->getActiveSheet()->getStyle($this->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
             $fila++;
         }
@@ -274,9 +401,9 @@ class GenerarAnexoController extends Controller
             $resultado  =   $array->where('letra',$i)->first();
             if($resultado){
                 if($resultado->base){
-                    $archivo->getActiveSheet()->setCellValue($i.$inicio,"B.I. ".$resultado->por->label." ".$resultado->imp->impuesto_t17);
+                    $archivo->getActiveSheet()->setCellValue($i.$inicio,"B.I. ".@$resultado->imp2->label." ".@$resultado->imp1->impuesto_t17);
                 }else{
-                    $archivo->getActiveSheet()->setCellValue($i.$inicio,$resultado->por->label." ".$resultado->imp->impuesto_t17);
+                    $archivo->getActiveSheet()->setCellValue($i.$inicio,@$resultado->imp2->label." ".@$resultado->imp1->impuesto_t17);
                 }
             }
         }
