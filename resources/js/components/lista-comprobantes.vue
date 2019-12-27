@@ -97,8 +97,11 @@
                         enabled: true,
                         initialSortBy: {field: 'fecha_co', type: 'asc'}
                       }"
-                    @on-row-click="verDetalles"
-            />
+                    @on-row-click="verDetalles">
+                <div slot="emptystate">
+                    <div class="vgt-center-align vgt-text-disabled">{{textoTabla}}</div>
+                </div>
+            </vue-good-table>
             <b-modal hide-footer centered id="comprobante" size="xl" title="Comprobante">
                 <modal-comprobante :datos="detalle"></modal-comprobante>
             </b-modal>
@@ -145,6 +148,10 @@
                         type: 'date',
                         dateInputFormat: 'YYYY-MM-DD',
                         dateOutputFormat: 'DD-MM-YYYY',
+                        filterOptions: {
+                            enabled: true,
+                            placeholder: 'Filtro por fecha de emision',
+                        },
                     },
                     {
                         label: 'Comprobante',
@@ -153,11 +160,20 @@
                     {
                         label: 'Emisor',
                         field: this.fieldFn,
+                        filterOptions: {
+                            enabled: true,
+                            placeholder: 'Filtro por Razón Social',
+                        },
                     },
                     {
                         label: 'Valor',
                         field: 'valor',
                         type: 'decimal',
+                        filterOptions: {
+                            enabled: true,
+                            placeholder: 'Valor Total',
+                            filterFn: this.filtrarValor,
+                        },
                     },
                 ],
                 filas: [],
@@ -169,10 +185,15 @@
                 excel:false,
                 detalle:{
                     comprobante:{}
-                }
+                },
+                textoTabla:"Elija un cliente",
             }
         },
         methods:{
+            filtrarValor: function(data, filterString) {
+                let x = parseFloat(filterString);
+                return data >= x && data<=x+x;
+            },
             verDetalles(data){
                 this.$root.$emit('bv::show::modal', 'comprobante');
                 this.detalle=data.row;
@@ -196,16 +217,21 @@
             consulta:function(){
                 if(this.cliente){
                     this.mensaje.texto="Suba el resumen de comprobantes del cliente \n"+this.cliente.apellidos_cl+" "+this.cliente.nombres_cl+"</b>";
+                    this.filas=[];
+                    this.textoTabla="Procesando datos";
                     servicios.comprobantes.update(this.cliente,this.desde,this.hasta).then((response)=>{
                         this.filas=response.data;
-                        if(response.data.length)
+                        this.textoTabla="No tiene comprobantes registrados";
+                        if(response.data.length){}
                             this.excel=true;
                     }).catch((error)=>{
                         this.$toast.error(error.response.data.message, 'Error');
                         this.excel=false;
+                        this.textoTabla="Ha ocurrido un error";
                     });
                 }else{
                     this.$toast.error("Elija un cliente primero", 'Error');
+                    this.textoTabla="Elija un cliente";
                 }
             },
             descargarExcel:function(){
