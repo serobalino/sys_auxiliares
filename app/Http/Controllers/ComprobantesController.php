@@ -23,13 +23,13 @@ class ComprobantesController extends Controller
      * @param array $comprobantes
      * @return Comprobante
      */
-    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[7]){
+    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[1,7]){
         if($desde!==null && $hasta===null){
             return Comprobante::where("id_cl",$id)
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
                 ->where('fecha_co','>=', $desde)
-                ->where('id_tc',$comprobantes)
+                ->whereIn('id_tc',$comprobantes)
                 ->get();
         }
         if ($desde===null && $hasta!==null){
@@ -37,7 +37,7 @@ class ComprobantesController extends Controller
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
                 ->where('fecha_co','<=', $hasta)
-                ->where('id_tc',$comprobantes)
+                ->whereIn('id_tc',$comprobantes)
                 ->get();
         }
         if ($desde!==null && $hasta!==null){
@@ -45,13 +45,13 @@ class ComprobantesController extends Controller
                 ->orderBy("fecha_co","asc")
                 ->orderBy("id_tc","desc")
                 ->whereBetween('fecha_co', [$desde, $hasta])
-                ->where('id_tc',$comprobantes)
+                ->whereIn('id_tc',$comprobantes)
                 ->get();
         }
         return Comprobante::where("id_cl",$id)
             ->orderBy("fecha_co","asc")
             ->orderBy("id_tc","desc")
-            ->where('id_tc',$comprobantes)
+            ->whereIn('id_tc',$comprobantes)
             ->get();
     }
 
