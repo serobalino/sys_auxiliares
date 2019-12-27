@@ -11,6 +11,7 @@ use App\Http\Requests\Comprobantes\Lista\RangoRequest;
 use Illuminate\Http\Request;
 use Jenssegers\Date\Date;
 use PHPExcel_Cell_DataType;
+use PHPExcel_Style_Alignment;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class GenerarAnexoController extends Controller
@@ -420,8 +421,18 @@ class GenerarAnexoController extends Controller
 
         //Ajuta el tamaño de la celda para todas las columnas usadas
         for ($i="A";$i<=$this->letra;$i++ ){
-            $archivo->getActiveSheet()->getColumnDimension($i)->setAutoSize(true);
+            if($i>="J"){
+                $archivo->getActiveSheet()->getColumnDimension($i)->setWidth(12.7);
+            }else{
+                if($i==="I"){
+                    $archivo->getActiveSheet()->getColumnDimension($i)->setWidth(67.7);
+                }else{
+                    $archivo->getActiveSheet()->getColumnDimension($i)->setAutoSize(true);
+                }
+            }
         }
+        $archivo->getActiveSheet()->getStyle("A$inicio:".$this->letra.$inicio)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $archivo->getActiveSheet()->getStyle("A$inicio:".$this->letra.$inicio)->getAlignment()->setWrapText(true);
 
         //Combinar celdas
         $archivo->getActiveSheet()->mergeCells("A1:".$this->letra."1");
