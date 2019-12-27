@@ -121,7 +121,7 @@ class GenerarAnexoController extends Controller
         $cliente    =   Cliente::find($id);
         $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
         $nomArchivo =   str_replace(' ', '-', $nomArchivo);
-        $nomArchivo =    preg_replace('/[^A-Za-z0-9\-]/', '', $nomArchivo);
+        $nomArchivo =   preg_replace('/[^A-Za-z0-9\-]/', '', $nomArchivo);
         $inicio     =   5;
 
         $archivo    =   new Spreadsheet();
@@ -295,8 +295,6 @@ class GenerarAnexoController extends Controller
 
         $actual =   now();
 
-
-        Log::info($this->impuestos);
         //log
         $this->registro->log(auth()->user(),$cliente,"Generacion de Excel con comprobantes",$request);
 
