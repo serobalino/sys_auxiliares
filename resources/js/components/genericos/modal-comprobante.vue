@@ -1,5 +1,5 @@
 <template>
-    <json-view :data="datos.comprobante"></json-view>
+    <json-view :data="datos.comprobante" rootKey="comprobante" :maxDepth="1"></json-view>
 </template>
 
 <script>
