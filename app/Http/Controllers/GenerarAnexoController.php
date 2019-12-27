@@ -118,13 +118,21 @@ class GenerarAnexoController extends Controller
                 case 6://guia de remision
                     break;
                 case 7://comprobante de retencion
+                    $aux    =   Tabla20::find($impuesto->codigoRetencion);
+                    if(!$aux){
+                        $aux                    =   new Tabla20();
+                        $aux->cod_t20           =   $impuesto->codigoRetencion;
+                        $aux->porcentaje_t20    =   (int)$impuesto->porcentajeRetener;
+                        $aux->save();
+                    }
+
                     $this->letra++;
                     $obj2    =   [
                         'letra'=>$this->letra,
                         'codigo1'=>$impuesto->codigo,
                         'codigo2'=>$impuesto->codigoRetencion,
                         'imp1'=>Tabla17::find($impuesto->codigo),
-                        'imp2'=>Tabla20::find($impuesto->codigoRetencion),
+                        'imp2'=>$aux,
                         'base'=>true,
                         'id_tc'=>$comprobante
                     ];
