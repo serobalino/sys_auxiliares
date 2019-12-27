@@ -335,8 +335,8 @@ class GenerarAnexoController extends Controller
                         ->setCellValue("H$fila",$empresa)
                         ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc, 'UTF-8'));
 
-                    if(gettype($nivel->comprobante->impuestos)==="array"){
-                        foreach ($nivel->comprobante->impuestos as $impuesto){
+                    if(gettype($nivel->comprobante->impuestos->impuesto)==="array"){
+                        foreach ($nivel->comprobante->impuestos->impuesto as $impuesto){
                             if($impuesto->baseImponible>0){
                                 $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
                                 $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
