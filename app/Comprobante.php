@@ -37,7 +37,7 @@ class Comprobante extends Model
             case 3://liquidacion de compra
                 break;
             case 4://nota de credito
-                $valor=$comprobante->info->valorModificacion;
+                $valor=$comprobante->info->valorModificacion*-1;
                 break;
             case 5://nota de debito
                 $valor=$comprobante->info->valorTotal;
