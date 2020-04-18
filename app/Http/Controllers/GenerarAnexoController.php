@@ -58,6 +58,11 @@ class GenerarAnexoController extends Controller
             case 3://liquidacion de compra
                 break;
             case 4://nota de credito
+                $resultado  =   $array->where('codigo1',$impuesto->codigo)
+                    ->where('codigo2',$impuesto->codigoPorcentaje)
+                    ->where('base',$bandera)
+                    ->where('id_tc',1)
+                    ->first();
                 break;
             case 5://nota de debito
                 break;
@@ -113,6 +118,31 @@ class GenerarAnexoController extends Controller
                 case 3://liquidacion de compra
                     break;
                 case 4://nota de credito
+                    $this->letra++;
+                    $obj2    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoPorcentaje,
+                        'imp1'=>Tabla17::find($impuesto->codigo),
+                        'imp2'=>Tabla18::find($impuesto->codigoPorcentaje) ? Tabla18::find($impuesto->codigoPorcentaje) : Tabla19::find($impuesto->codigoPorcentaje),
+                        'base'=>true,
+                        'id_tc'=>1
+                    ];
+                    $obj2    =   (object)$obj2;
+                    $array->push($obj2);
+
+                    $this->letra++;
+                    $obj1    =   [
+                        'letra'=>$this->letra,
+                        'codigo1'=>$impuesto->codigo,
+                        'codigo2'=>$impuesto->codigoPorcentaje,
+                        'imp1'=>$obj2->imp1,
+                        'imp2'=>$obj2->imp2,
+                        'base'=>!$obj2->base,
+                        'id_tc'=>1
+                    ];
+                    $obj1    =   (object)$obj1;
+                    $array->push($obj1);
                     break;
                 case 5://nota de debito
                     break;
@@ -319,6 +349,8 @@ class GenerarAnexoController extends Controller
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
+                    $archivo->getActiveSheet()->getStyle("A$fila:ZZ$fila")
+                        ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK);
 
                     break;
                 case 2://nota de venta
@@ -326,10 +358,60 @@ class GenerarAnexoController extends Controller
                 case 3://liquidacion de compra
                     break;
                 case 4://nota de credito
+                    $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
+                        ->setCellValue("B$fila","$minMes-$dia")
+                        ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValue("H$fila",$empresa)
+                        ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc, 'UTF-8'));
+
+//                    $nivel->comprobante->info->totalConImpuestos->totalImpuesto
+                    if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
+                        foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
+                            if($impuesto->baseImponible>0){
+                                $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                            if($impuesto->valor>0){
+                                $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                                $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                            }
+                        }
+                    }else{
+                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
+                            $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
+                            $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
+                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
+                            $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                            $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
+                        }
+                    }
+
+
+                    $archivo->getActiveSheet()->getStyle("A$fila:ZZ$fila")
+                        ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKRED);
 
                     break;
                 case 5://nota de debito
-
+                    $archivo->getActiveSheet()->setCellValue("A$fila",$cont)
+                        ->setCellValue("B$fila","$minMes-$dia")
+                        ->setCellValueExplicit("C$fila",$nivel->id_co,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("D$fila",$nivel->comprobante->infoTributaria->estab,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
+                        ->setCellValue("H$fila",$empresa)
+                        ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc, 'UTF-8'));
+                    $archivo->getActiveSheet()->getStyle("A$fila:ZZ$fila")
+                        ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKBLUE);
                     break;
                 case 6://guia de remision
                     break;
@@ -369,6 +451,8 @@ class GenerarAnexoController extends Controller
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
+                    $archivo->getActiveSheet()->getStyle("A$fila")
+                        ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK);
 
                     break;
                 case 8://entradas a espectaculos
