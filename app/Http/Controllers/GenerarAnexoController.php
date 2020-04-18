@@ -381,28 +381,28 @@ class GenerarAnexoController extends Controller
                         ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
                         ->setCellValue("H$fila",$empresa)
                         ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." ".$nivel->comprobante->info->fechaEmisionDocSustento." #".$nivel->comprobante->info->numDocModificado, 'UTF-8'));
-                    if(gettype($nivel->comprobante->info->totalConImpuestos->totalImpuesto)==="array"){
-                        foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
+                    if(gettype($nivel->comprobante->impuestos->impuesto)==="array"){
+                        foreach ($nivel->comprobante->impuestos->impuesto as $impuesto){
                             if($impuesto->baseImponible>0){
                                 $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
                                 $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
                                 $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
-                            if($impuesto->valor>0){
+                            if($impuesto->valorRetenido>0){
                                 $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valorRetenido);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                         }
                     }else{
-                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
-                            $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
+                        if($nivel->comprobante->impuestos->impuesto->baseImponible>0){
+                            $aux    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,true,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->impuestos->impuesto->baseImponible);
                             $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
-                        if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
-                            $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                        if($nivel->comprobante->impuestos->impuesto->valorRetenido>0){
+                            $aux2    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,false,$nivel->id_tc);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->impuestos->impuesto->valorRetenido);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
