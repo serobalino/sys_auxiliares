@@ -346,24 +346,24 @@ class GenerarAnexoController extends Controller
                         foreach ($nivel->comprobante->info->totalConImpuestos->totalImpuesto as $impuesto){
                             if($impuesto->baseImponible>0){
                                 $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$impuesto->baseImponible);
                                 $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                             if($impuesto->valor>0){
                                 $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valor);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                         }
                     }else{
                         if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible>0){
                             $aux    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,true,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$nivel->comprobante->info->totalConImpuestos->totalImpuesto->baseImponible);
                             $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                         if($nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor>0){
                             $aux2    =   $this->listaImpuestos($nivel->comprobante->info->totalConImpuestos->totalImpuesto,false,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$nivel->comprobante->info->totalConImpuestos->totalImpuesto->valor);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
@@ -385,24 +385,24 @@ class GenerarAnexoController extends Controller
                         foreach ($nivel->comprobante->info->impuestos->impuesto as $impuesto){
                             if($impuesto->baseImponible>0){
                                 $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$impuesto->baseImponible);
                                 $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                             if($impuesto->valor>0){
                                 $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valor);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valor);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                         }
                     }else{
                         if($nivel->comprobante->info->impuestos->impuesto->baseImponible>0){
                             $aux    =   $this->listaImpuestos($nivel->comprobante->info->impuestos->impuesto,true,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->info->impuestos->impuesto->baseImponible);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$nivel->comprobante->info->impuestos->impuesto->baseImponible);
                             $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                         if($nivel->comprobante->info->impuestos->impuesto->valor>0){
                             $aux2    =   $this->listaImpuestos($nivel->comprobante->info->impuestos->impuesto,false,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->info->impuestos->impuesto->valor);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$nivel->comprobante->info->impuestos->impuesto->valor);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
@@ -426,24 +426,24 @@ class GenerarAnexoController extends Controller
                         foreach ($nivel->comprobante->impuestos->impuesto as $impuesto){
                             if($impuesto->baseImponible>0){
                                 $aux    =   $this->listaImpuestos($impuesto,true,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$impuesto->baseImponible);
+                                $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$impuesto->baseImponible);
                                 $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                             if($impuesto->valorRetenido>0){
                                 $aux2    =   $this->listaImpuestos($impuesto,false,$nivel->id_tc);
-                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$impuesto->valorRetenido);
+                                $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valorRetenido);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
                         }
                     }else{
                         if($nivel->comprobante->impuestos->impuesto->baseImponible>0){
                             $aux    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,true,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,$nivel->comprobante->impuestos->impuesto->baseImponible);
+                            $archivo->getActiveSheet()->setCellValue($aux->letra.$fila,(float)$nivel->comprobante->impuestos->impuesto->baseImponible);
                             $archivo->getActiveSheet()->getStyle($aux->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                         if($nivel->comprobante->impuestos->impuesto->valorRetenido>0){
                             $aux2    =   $this->listaImpuestos($nivel->comprobante->impuestos->impuesto,false,$nivel->id_tc);
-                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,$nivel->comprobante->impuestos->impuesto->valorRetenido);
+                            $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$nivel->comprobante->impuestos->impuesto->valorRetenido);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
                     }
@@ -479,7 +479,7 @@ class GenerarAnexoController extends Controller
                 $fila++;
                 $aux_mes=$mes;
             }
-            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,$nivel->valor);
+            $archivo->getActiveSheet()->setCellValue($this->letra.$fila,(float)$nivel->valor);
             $archivo->getActiveSheet()->getStyle($this->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
             $fila++;
         }
