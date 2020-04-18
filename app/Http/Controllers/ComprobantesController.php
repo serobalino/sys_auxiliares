@@ -23,7 +23,7 @@ class ComprobantesController extends Controller
      * @param array $comprobantes
      * @return Comprobante
      */
-    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[1,7]){
+    public function consulta ($id,$desde=null,$hasta=null,$comprobantes=[1,4,5,7]){
         if($desde!==null && $hasta===null){
             return Comprobante::where("id_cl",$id)
                 ->orderBy("fecha_co","asc")
