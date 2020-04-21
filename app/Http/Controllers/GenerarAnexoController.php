@@ -6,6 +6,7 @@ use App\Catalogos\Tabla17;
 use App\Catalogos\Tabla18;
 use App\Catalogos\Tabla19;
 use App\Catalogos\Tabla20;
+use App\Catalogos\Tabla21;
 use App\Cliente;
 use App\Http\Requests\Comprobantes\Lista\RangoRequest;
 use Illuminate\Http\Request;
@@ -98,11 +99,11 @@ class GenerarAnexoController extends Controller
                 case 6://guia de remision
                     break;
                 case 7://comprobante de retencion
-                    $aux    =   Tabla20::find($impuesto->codigoRetencion);
+                    $aux    =   Tabla21::find($impuesto->codigoRetencion);
                     if(!$aux){
-                        $aux                    =   new Tabla20();
-                        $aux->cod_t20           =   $impuesto->codigoRetencion;
-                        $aux->porcentaje_t20    =   (int)$impuesto->porcentajeRetener;
+                        $aux                    =   new Tabla21();
+                        $aux->cod_t21           =   $impuesto->codigoRetencion;
+                        $aux->porcentaje_t21    =   (int)$impuesto->porcentajeRetener;
                         $aux->save();
                     }
 
@@ -111,7 +112,7 @@ class GenerarAnexoController extends Controller
                         'letra'=>$this->letra,
                         'codigo1'=>$impuesto->codigo,
                         'codigo2'=>$impuesto->codigoRetencion,
-                        'imp1'=>Tabla17::find($impuesto->codigo),
+                        'imp1'=>Tabla20::find($impuesto->codigo),
                         'imp2'=>$aux,
                         'base'=>true,
                         'id_tc'=>$comprobante
