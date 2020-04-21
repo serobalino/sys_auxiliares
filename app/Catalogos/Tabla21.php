@@ -14,6 +14,7 @@ class Tabla21 extends Model
 
     public function getLabelAttribute()
     {
-        return "Retención de ".$this->attributes['porcentaje_t21']."%";
+        //return "Retención de ".$this->attributes['porcentaje_t21']."%";
+        return $this->attributes['detalle_t21'];
     }
 }
