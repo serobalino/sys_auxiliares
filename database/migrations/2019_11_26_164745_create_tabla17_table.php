@@ -15,7 +15,7 @@ class CreateTabla17Table extends Migration
     {
         //lista de impuestos
         Schema::create('tabla17', function (Blueprint $table) {
-            $table->smallInteger('cod_t17');
+            $table->smallInteger('cod_t17')->primary();
             $table->string("impuesto_t17")->nullable();
         });
     }

@@ -15,7 +15,7 @@ class CreateTabla18Table extends Migration
     {
         //tarifa iva
         Schema::create('tabla18', function (Blueprint $table) {
-            $table->smallInteger('cod_t18');
+            $table->smallInteger('cod_t18')->primary();
             $table->string("detalle_t18")->nullable();
         });
     }

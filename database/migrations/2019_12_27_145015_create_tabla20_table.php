@@ -14,7 +14,7 @@ class CreateTabla20Table extends Migration
     public function up()
     {
         Schema::create('tabla20', function (Blueprint $table) {
-            $table->bigInteger('cod_t20');
+            $table->bigInteger('cod_t20')->primary();
             $table->string("detalle_t20",350)->nullable();
             $table->tinyInteger("porcentaje_t20");
         });
