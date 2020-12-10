@@ -46,7 +46,7 @@ class Comprobante extends Model
                 break;
             case 7://comprobante de retencion
                 $valor=0;
-                if(is_array($comprobante->impuestos->impuesto))
+                if(@is_array($comprobante->impuestos->impuesto))
                     foreach ($comprobante->impuestos->impuesto  as $item)
                         $valor+=$item->valorRetenido;
                 else
