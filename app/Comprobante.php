@@ -50,7 +50,7 @@ class Comprobante extends Model
                     foreach ($comprobante->impuestos->impuesto  as $item)
                         $valor+=$item->valorRetenido;
                 else
-                    $valor+=$comprobante->impuestos->impuesto->valorRetenido;
+                    $valor+=@$comprobante->impuestos->impuesto->valorRetenido;
 
                 break;
             case 8://entradas a espectaculos
