@@ -33,6 +33,7 @@
         "vue-good-table": "^2.16.5",
         "vue-izitoast": "^1.1.2",
         "vue-json-component": "^0.3.0",
+        "vue-json-to-table": "^1.0.7",
         "vue-multiselect": "^2.1.6",
         "vuex": "^3.4.0",
         "vuex-persist": "^2.2.0",
