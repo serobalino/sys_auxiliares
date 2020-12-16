@@ -7,7 +7,7 @@ use App\Catalogos\Tabla18;
 use App\Catalogos\Tabla19;
 use App\Catalogos\Tabla20;
 use App\Catalogos\Tabla21;
-use App\Cliente;
+use App\Clientes\Cliente;
 use App\Http\Requests\Comprobantes\Lista\RangoRequest;
 use Illuminate\Http\Request;
 use Jenssegers\Date\Date;
