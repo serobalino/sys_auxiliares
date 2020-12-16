@@ -89,10 +89,14 @@
                 </div>
             </div>
             <div class="botones text-right">
-                <button class="btn btn-success" v-if="excel" v-on:click="descargarExcel"><i
-                    class="fa fa-file-excel-o"></i> Generar Excel
+                <button class="btn btn-success" :disabled="cargandoEx" v-if="excel" v-on:click="descargarExcel">
+                    <i class="fa" :class="cargandoEx ? 'fa-spin fa-spinner' :'fa-file-excel-o'"/>
+                    {{ cargandoEx ? 'Generando Excel' : 'Generar Excel' }}
                 </button>
-                <button class="btn btn-primary" v-on:click="consulta">Buscar</button>
+                <button class="btn btn-primary" :disabled="cargandoBs" v-on:click="consulta">
+                    <i class="fa fa-spin fa-spinner" v-if="cargandoBs"/>
+                    Buscar
+                </button>
             </div>
             <vue-good-table
                 :columns="columns"
@@ -207,6 +211,8 @@ export default {
                 comprobante: {}
             },
             textoTabla: "Elija un cliente",
+            cargandoBs: false,
+            cargandoEx: false,
         }
     },
     methods: {
@@ -236,18 +242,19 @@ export default {
         },
         consulta: function () {
             if (this.cliente) {
+                this.cargandoBs=true;
                 this.mensaje.texto = "Suba el resumen de comprobantes del cliente \n" + this.cliente.apellidos_cl + " " + this.cliente.nombres_cl + "</b>";
                 this.filas = [];
                 this.textoTabla = "Procesando datos";
                 servicios.comprobantes.update(this.cliente, this.desde, this.hasta).then((response) => {
                     this.filas = response.data;
                     this.textoTabla = "No tiene comprobantes registrados";
-                    if (response.data.length) {
-                    }
+                    this.cargandoBs=false;
                     this.excel = true;
                 }).catch((error) => {
                     this.$toast.error(error.response.data.message, 'Error');
                     this.excel = false;
+                    this.cargandoBs=false;
                     this.textoTabla = "Ha ocurrido un error";
                 });
             } else {
@@ -256,9 +263,13 @@ export default {
             }
         },
         descargarExcel: function () {
+            this.cargandoEx=true;
             servicios.comprobantes.descargar(this.cliente, this.desde, this.hasta).then((response) => {
                 let fileDownload = require('js-file-download');
                 fileDownload(response.data, response.headers.nombre);
+                this.cargandoEx=false;
+            }).catch(()=>{
+                this.cargandoEx=false;
             });
         },
         subir: function () {
