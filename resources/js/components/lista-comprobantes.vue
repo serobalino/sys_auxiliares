@@ -58,7 +58,11 @@
                 <hr>
                 <p class="mb-0">
                    <b>Cédula</b> {{cliente.dni_cl}}<br>
-                   <b>RUC</b> {{cliente.ruc_cl}}
+                   <b>RUC</b> {{cliente.ruc_cl}}<br>
+                    <span v-if="cliente.email_cl"><b>Email</b> <a :href="'mailto:'+cliente.email_cl">{{cliente.email_cl}}</a><br></span>
+                    <template v-if="cliente.contrasenas.length">
+                        <span v-for="item in cliente.contrasenas"><b>Contranseña de {{item.label.nombre_tc}}</b> {{item.contrasena_hc}}</span>
+                    </template>
                 </p>
             </b-alert>
             <b-alert show variant="danger" v-else>
@@ -113,6 +117,9 @@
     import { VueGoodTable } from 'vue-good-table';
     import { Datetime } from 'vue-datetime';
     import * as servicios from "../servicios";
+    import { Settings } from 'luxon'
+
+    Settings.defaultLocale = 'es'
     export default {
         name: "lista-comprobantes",
         props:{
@@ -123,6 +130,7 @@
         },
         components: {
             VueGoodTable,
+            Datetime
         },
         watch:{
             cliente:function(){
