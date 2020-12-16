@@ -207,7 +207,7 @@ class GenerarAnexoController extends Controller
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
     public function show(RangoRequest $request,$id){
-        set_time_limit ( 10*60);
+        set_time_limit (0);
         $cliente    =   Cliente::find($id);
         $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
         $nomArchivo =   str_replace(' ', '-', $nomArchivo);
