@@ -12,6 +12,7 @@ import BootstrapVue from 'bootstrap-vue';
 import VueIziToast from "vue-izitoast";
 import VeeValidate from 'vee-validate';
 import es from 'vee-validate/dist/locale/es';
+import store from './store';
 
 
 
@@ -46,4 +47,5 @@ Vue.use(VeeValidate, {
 
 const app = new Vue({
     el: '#app',
+    store
 });
