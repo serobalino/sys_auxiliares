@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Cliente;
+use App\Clientes\Cliente;
 use App\Comprobante;
 use Illuminate\Database\QueryException;
 use Jenssegers\Date\Date;
