@@ -29,4 +29,8 @@ Route::middleware('verified')->group(function () {
             Route::post("comprobante","SubirController@comprobante");
         });
     });
+    Route::prefix('ctlgs')->group(function () {
+        Route::get("comprobantes", "CatalogosController@indexComprobantes");
+        Route::get("claves", "CatalogosController@indexClave");
+    });
 });
