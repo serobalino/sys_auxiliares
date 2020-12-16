@@ -144,7 +144,7 @@
                     return this.lista;
                 let self = this;
                 return self.lista.filter(function (post) {
-                    return post.apellidos_cl.indexOf(self.buscar) !== -1 || post.nombres_cl.indexOf(self.buscar) !== -1 || post.dni_cl.indexOf(self.buscar) !== -1 || post.razon_cl.indexOf(self.buscar) !== -1;
+                    return post.apellidos_cl.indexOf(self.buscar.toUpperCase()) !== -1 || post.nombres_cl.indexOf(self.buscar.toUpperCase()) !== -1 || post.dni_cl.indexOf(self.buscar.toUpperCase()) !== -1 || post.razon_cl.indexOf(self.buscar.toUpperCase()) !== -1;
                 })
             },
             // lstComprobantes:function(){
