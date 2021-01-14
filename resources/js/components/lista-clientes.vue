@@ -185,7 +185,8 @@
             seleccionar:function(item){
                 this.estado.id=0;
                 this.picker=item;
-                this.asignarClave(item.contrasenas)
+                this.limpiarClaves();
+                this.asignarClave(item.contrasenas);
                 this.$emit('seleccionado',item);
             },
             consultar:function(){
