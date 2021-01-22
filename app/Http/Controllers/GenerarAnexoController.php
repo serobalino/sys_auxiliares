@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Catalogos\Comprobante;
 use App\Catalogos\Tabla17;
 use App\Catalogos\Tabla18;
 use App\Catalogos\Tabla19;
@@ -208,6 +209,7 @@ class GenerarAnexoController extends Controller
      */
     public function show(RangoRequest $request,$id){
         set_time_limit (0);
+        $tipo_comp  =   Comprobante::all();
         $cliente    =   Cliente::find($id);
         $nomArchivo =   "$cliente->apellidos_cl $cliente->nombres_cl";
         $nomArchivo =   str_replace(' ', '-', $nomArchivo);
@@ -421,9 +423,9 @@ class GenerarAnexoController extends Controller
                         ->setCellValueExplicit("E$fila",$nivel->comprobante->infoTributaria->ptoEmi,PHPExcel_Cell_DataType::TYPE_STRING)
                         ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
                         ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
-                        ->setCellValue("H$fila",$empresa)
-                        ->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc, 'UTF-8'));
-
+                        ->setCellValue("H$fila",$empresa);
+                    $sustento="S/N";
+                    $susDoc=1;
                     if(@gettype($nivel->comprobante->impuestos->impuesto)==="array"){
                         foreach ($nivel->comprobante->impuestos->impuesto as $impuesto){
                             if($impuesto->baseImponible>0){
@@ -436,6 +438,8 @@ class GenerarAnexoController extends Controller
                                 $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valorRetenido);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
+                            $sustento=$impuesto->numDocSustento;
+                            $susDoc=$impuesto->codDocSustento;
                         }
                     }else{
                         if(@$nivel->comprobante->impuestos->impuesto->baseImponible>0){
@@ -448,7 +452,11 @@ class GenerarAnexoController extends Controller
                             $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$nivel->comprobante->impuestos->impuesto->valorRetenido);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
+                        $sustento=@$nivel->comprobante->impuestos->impuesto->numDocSustento;
+                        $susDoc=@$nivel->comprobante->impuestos->impuesto->codDocSustento;
                     }
+                    $tagSusCod = $tipo_comp->firstWhere('id_tc','=',(int)$susDoc);
+                    $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." $tagSusCod->detalle_tc #$sustento", 'UTF-8'));
                     $archivo->getActiveSheet()->getStyle("A$fila")
                         ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK);
 
