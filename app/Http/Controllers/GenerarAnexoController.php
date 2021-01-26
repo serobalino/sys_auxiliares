@@ -424,7 +424,7 @@ class GenerarAnexoController extends Controller
                         ->setCellValueExplicit("F$fila",$nivel->comprobante->infoTributaria->secuencial,PHPExcel_Cell_DataType::TYPE_STRING)
                         ->setCellValueExplicit("G$fila",$nivel->comprobante->infoTributaria->ruc,PHPExcel_Cell_DataType::TYPE_STRING)
                         ->setCellValue("H$fila",$empresa);
-                    $sustento="S/N";
+                    $sustento=null;
                     $susDoc=1;
                     if(@gettype($nivel->comprobante->impuestos->impuesto)==="array"){
                         foreach ($nivel->comprobante->impuestos->impuesto as $impuesto){
@@ -438,7 +438,7 @@ class GenerarAnexoController extends Controller
                                 $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valorRetenido);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
-                            $sustento=@$impuesto->numDocSustento;
+                            $sustento=@(int)$impuesto->numDocSustento;
                             $susDoc=$impuesto->codDocSustento;
                         }
                     }else{
@@ -452,12 +452,13 @@ class GenerarAnexoController extends Controller
                             $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$nivel->comprobante->impuestos->impuesto->valorRetenido);
                             $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                         }
-                        $sustento=@$nivel->comprobante->impuestos->impuesto->numDocSustento;
+                        $sustento=@(int)$nivel->comprobante->impuestos->impuesto->numDocSustento;
                         $susDoc=@$nivel->comprobante->impuestos->impuesto->codDocSustento;
                     }
+                    $sustento=$sustento ? "#$sustento" : "S/N";
                     if($susDoc){
-                        $tagSusCod = @$tipo_comp->firstWhere('id_tc','=',(int)$susDoc);
-                        $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc.@" $tagSusCod->detalle_tc #$sustento", 'UTF-8'));
+                        $tagSusCod = $tipo_comp->firstWhere('id_tc','=',(int)$susDoc);
+                        $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." $tagSusCod->detalle_tc $sustento", 'UTF-8'));
                     }else{
                         $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." SIN DCT DE SUSTENTO", 'UTF-8'));
                     }
