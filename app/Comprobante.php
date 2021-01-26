@@ -46,12 +46,19 @@ class Comprobante extends Model
                 break;
             case 7://comprobante de retencion
                 $valor=0;
-                if(@is_array($comprobante->impuestos->impuesto))
-                    foreach ($comprobante->impuestos->impuesto  as $item)
-                        $valor+=$item->valorRetenido;
-                else
-                    $valor+=@$comprobante->impuestos->impuesto->valorRetenido;
-
+                if($comprobante->{'@attributes'}->version==="1.0.0"){
+                    if(@is_array($comprobante->impuestos->impuesto))
+                        foreach ($comprobante->impuestos->impuesto  as $item)
+                            $valor+=$item->valorRetenido;
+                    else
+                        $valor+=@$comprobante->impuestos->impuesto->valorRetenido;
+                }else{
+                    if(@is_array($comprobante->docsSustento->docSustento->retenciones->retencion))
+                        foreach ($comprobante->docsSustento->docSustento->retenciones->retencion  as $item)
+                            $valor+=$item->valorRetenido;
+                    else
+                        $valor+=@$comprobante->docsSustento->docSustento->retenciones->retencion->valorRetenido;
+                }
                 break;
             case 8://entradas a espectaculos
                 break;
