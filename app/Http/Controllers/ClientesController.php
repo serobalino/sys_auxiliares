@@ -93,9 +93,9 @@ class ClientesController extends Controller
             $clave = Contrasena::where('id_cl',$cliente->id_cl)
                 ->where('id_tc',$item['id_tc'])
                 ->where('estado_hc',true)
-                ->where('contrasena_hc',$item['clave'])
+                ->where('contrasena_hc',@$item['clave'])
                 ->first();
-            if(!$clave && $item['clave']){
+            if(!$clave && @$item['clave']){
                 Contrasena::where('id_cl',$cliente->id_cl)
                     ->where('id_tc',$item['id_tc'])
                     ->update(['estado_hc' => false]);
