@@ -438,7 +438,7 @@ class GenerarAnexoController extends Controller
                                 $archivo->getActiveSheet()->setCellValue($aux2->letra.$fila,(float)$impuesto->valorRetenido);
                                 $archivo->getActiveSheet()->getStyle($aux2->letra.$fila)->getNumberFormat()->setFormatCode('0.00');
                             }
-                            $sustento=$impuesto->numDocSustento;
+                            $sustento=@$impuesto->numDocSustento;
                             $susDoc=$impuesto->codDocSustento;
                         }
                     }else{
