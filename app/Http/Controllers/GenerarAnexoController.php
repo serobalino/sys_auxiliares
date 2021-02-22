@@ -489,11 +489,14 @@ class GenerarAnexoController extends Controller
                     $sustento=$sustento ? "#$sustento" : "S/N";
                     if($susDoc){
                         $tagSusCod = $tipo_comp->firstWhere('id_tc','=',(int)$susDoc);
-                        $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." $tagSusCod->detalle_tc $sustento", 'UTF-8'));
+                        if($tagSusCod){
+                            $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." $tagSusCod->detalle_tc $sustento", 'UTF-8'));
+                        }else{
+                            $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." Documento tipo($susDoc) $sustento", 'UTF-8'));
+                        }
                     }else{
                         $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." SIN DCT DE SUSTENTO", 'UTF-8'));
                     }
-
                     $archivo->getActiveSheet()->getStyle("A$fila")
                         ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK);
 
