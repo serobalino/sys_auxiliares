@@ -487,7 +487,7 @@ class GenerarAnexoController extends Controller
                         $susDoc=@$nivel->comprobante->docsSustento->docSustento->codDocSustento;
                     }
                     $sustento=$sustento ? "#$sustento" : "S/N";
-                    if($susDoc){
+                    if((int)$susDoc){
                         $tagSusCod = $tipo_comp->firstWhere('id_tc','=',(int)$susDoc);
                         if($tagSusCod){
                             $archivo->getActiveSheet()->setCellValue("I$fila", mb_strtoupper($nivel->tipo->detalle_tc." $tagSusCod->detalle_tc $sustento", 'UTF-8'));
