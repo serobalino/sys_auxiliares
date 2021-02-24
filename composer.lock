@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d05b58078874341e8ffc6c442db7839",
+    "content-hash": "e33ebdcf7d0ed0c707fa3fd6e75172d0",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -3435,51 +3435,6 @@
             "time": "2020-02-21T04:36:14+00:00"
         },
         {
-            "name": "stnvh/php-partialzip",
-            "version": "0.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stnvh/php-partialzip.git",
-                "reference": "0dbdfb404598e1f8c15fe0f345bff747ddc028c6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stnvh/php-partialzip/zipball/0dbdfb404598e1f8c15fe0f345bff747ddc028c6",
-                "reference": "0dbdfb404598e1f8c15fe0f345bff747ddc028c6",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Stnvh\\Partial\\": "src/Stnvh/Partial/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Stan Hutcheon",
-                    "email": "stanhutcheon@me.com",
-                    "homepage": "https://github.com/stnvh/"
-                }
-            ],
-            "description": "Download files located within remote ZIP files ",
-            "homepage": "https://github.com/stnvh/php-partialzip",
-            "keywords": [
-                "partial",
-                "partialzip",
-                "php",
-                "zip"
-            ],
-            "support": {
-                "issues": "https://github.com/stnvh/php-partialzip/issues",
-                "source": "https://github.com/stnvh/php-partialzip/tree/0.2.1"
-            },
-            "time": "2016-11-01T17:49:03+00:00"
-        },
-        {
             "name": "swiftmailer/swiftmailer",
             "version": "v6.2.5",
             "source": {
@@ -5868,6 +5823,69 @@
             "time": "2021-01-20T14:39:46+00:00"
         },
         {
+            "name": "zanysoft/laravel-zip",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zanysoft/laravel-zip.git",
+                "reference": "466663746c92154c48a2d490efc6724f9f6e9652"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zanysoft/laravel-zip/zipball/466663746c92154c48a2d490efc6724f9f6e9652",
+                "reference": "466663746c92154c48a2d490efc6724f9f6e9652",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0|^5.0",
+                "scrutinizer/ocular": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "ZanySoft\\Zip\\ZipServiceProvider"
+                    ],
+                    "aliases": {
+                        "Zip": "ZanySoft\\Zip\\ZipFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "ZanySoft\\Zip\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Zany Soft",
+                    "email": "info@zanysoft.co",
+                    "homepage": "http://www.zanysoft.co"
+                }
+            ],
+            "description": "ZipArchive toolbox",
+            "homepage": "http://www.zanysoft.co",
+            "keywords": [
+                "merge",
+                "multiple",
+                "unzip",
+                "zip",
+                "ziparchive"
+            ],
+            "support": {
+                "issues": "https://github.com/zanysoft/laravel-zip/issues",
+                "source": "https://github.com/zanysoft/laravel-zip/tree/1.0.3"
+            },
+            "time": "2017-10-10T03:22:41+00:00"
+        },
+        {
             "name": "zendframework/zend-diactoros",
             "version": "2.2.1",
             "source": {
@@ -7956,7 +7974,9 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
-        "ext-soap": "*"
+        "ext-soap": "*",
+        "ext-zip": "*",
+        "ext-fileinfo": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"
