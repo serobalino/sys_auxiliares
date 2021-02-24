@@ -97,7 +97,7 @@ class ConsultaCatastrosController extends Controller
     }
 
     private function copyFile($obj){
-        $app = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).config("app.name");
+        $app = sys_get_temp_dir().DIRECTORY_SEPARATOR.config("app.name");
         if (!is_dir($app)){
             mkdir($app);
         }
