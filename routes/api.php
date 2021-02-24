@@ -17,4 +17,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('catastros','ConsultaCatastrosController@listaLink');
-Route::get('descargar','ConsultaCatastrosController@abrirZip');
+Route::post('catastros','ConsultaCatastrosController@downloadFile');

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Files\DownloadRemoteRequest;
 use DOMDocument;
 use DOMXPath;
 use Illuminate\Http\Request;
-use Stnvh\Partial\Zip;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Stnvh\Partial\Zip as Partial;
 use ZipArchive;
 
@@ -84,8 +85,37 @@ class ConsultaCatastrosController extends Controller
         }
     }
 
-    public function abrirZip(Request $datos)
+    public function downloadFile(DownloadRemoteRequest $datos)
     {
+        $local = $this->copyFile($datos);
+        return $this->openExcel($datos,$local);
+
+    }
+
+    private function copyFile($obj){
+        $filename = "$obj->name.$obj->ext";
+        $tempImage = tempnam(sys_get_temp_dir(), $filename);
+//        copy($obj->href, $tempImage);
+        return $tempImage;
+    }
+
+    private function openExcel($obj,$path)
+    {
+        $inputFileName = "Prueba.$obj->ext";
+
+        /**  Identify the type of $inputFileName  **/
+        $spreadsheet = new Spreadsheet();
+
+        $inputFileType = "Xlsx";
+        $inputFileName = $path;
+
+        /**  Create a new Reader of the type defined in $inputFileType  **/
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
+        /**  Load $inputFileName to a Spreadsheet Object  **/
+        $spreadsheet = $reader->load($inputFileName);
+    }
+
+    private function zipFile(){
         $link = "http://www.sri.gob.ec/DocumentosAlfrescoPortlet/descargar/4019b098-693f-4f5a-980e-008029d74205/AZUAY.zip";
         $p = new Partial($link);
         $list = dd($p->find('AZUAY.txt'));
