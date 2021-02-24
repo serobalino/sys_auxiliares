@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Files\DownloadRemoteRequest;
 use DOMDocument;
 use DOMXPath;
-use phpDocumentor\Reflection\Types\Object_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Smalot\PdfParser\Parser;
 use ZanySoft\Zip\Zip;
+use Spatie\PdfToText\Pdf;
 
 class ConsultaCatastrosController extends Controller
 {
@@ -61,18 +62,21 @@ class ConsultaCatastrosController extends Controller
         $local = $this->copyFile($datos);
 //        return $this->openExcel($datos,$local);
 //        return $local;
-        $archivos = $this->zipFile($local);
+        $archivos = $this->typeFile($datos,$local);
         $this->limpiarCacheResponse($local);
         $data = [];
         foreach ($archivos as $item) {
 //            return response()->streamDownload(function() use ($item){
 //                echo $this->readFile($item['file']);
 //            },"datos");
-            $data[] = $this->writeResponse($this->readFile($item['file']), $item['file']);
+            $data[] = $this->writeResponse($this->readFile($item), $item);
         }
         return $data;
+//        return $archivos;
     }
-    private function limpiarCacheResponse(string $path){
+
+    private function limpiarCacheResponse(string $path)
+    {
         $filePath = dirname($path);
         $destination = $filePath . DIRECTORY_SEPARATOR . "response";
         $files = glob($destination . DIRECTORY_SEPARATOR . "*");
@@ -83,10 +87,22 @@ class ConsultaCatastrosController extends Controller
         }
     }
 
+    private function typeFile($obj,string $path)
+    {
+        switch ($obj->ext){
+            case "zip":
+                return $this->zipFile($path);
+            case "pdf":
+                return $this->pdfFile($path);
+            default:
+                return [];
+        }
+    }
+
     private function convert($size)
     {
-        $unit=array('b','kb','mb','gb','tb','pb');
-        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
 
     private function writeResponse(array $data, string $path)
@@ -94,7 +110,7 @@ class ConsultaCatastrosController extends Controller
         $filePath = dirname($path, 2);
         $app = sys_get_temp_dir() . DIRECTORY_SEPARATOR . config("app.name");
         $destination = $filePath . DIRECTORY_SEPARATOR . "response";
-        $publicDesti = str_replace($app,'',$destination);
+        $publicDesti = str_replace($app, '', $destination);
         $files = glob($destination . DIRECTORY_SEPARATOR . "*");
         natsort($files);
         $lastFile = pathinfo(end($files), PATHINFO_FILENAME);
@@ -105,20 +121,20 @@ class ConsultaCatastrosController extends Controller
         $parte = 10000;
         $desde = 0;
         $records = [];
-        $nameFiles = $lastFile ? (int)$lastFile+$parte : 0;
+        $nameFiles = $lastFile ? (int)$lastFile + $parte : 0;
         while (($desde - $parte) < $size) {
             $lista = array_slice($data, $desde, $parte, false);
             $archivo = "$nameFiles.json";
             $nrmRegistros = count($lista);
-            if($nrmRegistros){
+            if ($nrmRegistros) {
                 $fp = fopen($destination . DIRECTORY_SEPARATOR . $archivo, 'w');
                 fwrite($fp, json_encode($lista));
                 fclose($fp);
                 $records[] = [
-                    'from'=> $desde,
-                    'lenght'=> $nrmRegistros,
+                    'from' => $desde,
+                    'lenght' => $nrmRegistros,
                     'size' => $this->convert(filesize($destination . DIRECTORY_SEPARATOR . $archivo)),
-                    'path'=> $publicDesti . DIRECTORY_SEPARATOR . $archivo,
+                    'path' => $publicDesti . DIRECTORY_SEPARATOR . $archivo,
                 ];
                 unset($lista);
             }
@@ -142,7 +158,11 @@ class ConsultaCatastrosController extends Controller
                     $i = 0;
                     $item = explode("\t", $linea);
                     foreach ($labels as $keys) {
-                        $aux[mb_strtolower($keys)] = utf8_encode(@$item[$i]);
+                        if(strlen($keys)<20){
+                            $aux[mb_strtolower($keys)] = utf8_encode(@$item[$i]);
+                        }else{
+                            $aux = utf8_encode(@$item[$i]);
+                        }
                         $i++;
                     }
                     $nueva[] = $aux;
@@ -197,14 +217,30 @@ class ConsultaCatastrosController extends Controller
         if ($handle = opendir($destination)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
-                    $lista[] = [
-                        'file' => $destination . DIRECTORY_SEPARATOR . $entry,
-//                        'ext'   =>  pathinfo($entry, PATHINFO_EXTENSION)
-                    ];
+                    $lista[] = $destination . DIRECTORY_SEPARATOR . $entry;
                 }
             }
             closedir($handle);
         }
+        return $lista;
+    }
+
+    private function pdfFile(string $path){
+        $parser = new Parser();
+        $pdf    = $parser->parseFile($path);
+        $filePath = dirname($path);
+        $destination = $filePath . DIRECTORY_SEPARATOR . "parsed";
+        if (!is_dir($destination)) {
+            mkdir($destination);
+        }
+        $lista = [];
+        $archivo = "pdf.txt";
+        $completePath = $destination . DIRECTORY_SEPARATOR . $archivo;
+        $texto = $pdf->getText();
+
+        file_put_contents($completePath,$texto);
+        $lista[]=$completePath;
+
         return $lista;
     }
 }
