@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Files\DownloadRemoteRequest;
 use DOMDocument;
 use DOMXPath;
-use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Object_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Stnvh\Partial\Zip as Partial;
 use ZanySoft\Zip\Zip;
-use ZipArchive;
 
 class ConsultaCatastrosController extends Controller
 {
@@ -58,63 +56,122 @@ class ConsultaCatastrosController extends Controller
 
     public function downloadFile(DownloadRemoteRequest $datos)
     {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 300);
         $local = $this->copyFile($datos);
 //        return $this->openExcel($datos,$local);
 //        return $local;
         $archivos = $this->zipFile($local);
+        $this->limpiarCacheResponse($local);
         $data = [];
-        foreach ($archivos as $item){
+        foreach ($archivos as $item) {
 //            return response()->streamDownload(function() use ($item){
 //                echo $this->readFile($item['file']);
 //            },"datos");
-            $data[]=$this->readFile($item['file']);
+            $data[] = $this->writeResponse($this->readFile($item['file']), $item['file']);
         }
         return $data;
     }
+    private function limpiarCacheResponse(string $path){
+        $filePath = dirname($path);
+        $destination = $filePath . DIRECTORY_SEPARATOR . "response";
+        $files = glob($destination . DIRECTORY_SEPARATOR . "*");
+        foreach ($files as $file) {
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
+    }
 
-    private function readFile($path)
+    private function convert($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
+
+    private function writeResponse(array $data, string $path)
+    {
+        $filePath = dirname($path, 2);
+        $app = sys_get_temp_dir() . DIRECTORY_SEPARATOR . config("app.name");
+        $destination = $filePath . DIRECTORY_SEPARATOR . "response";
+        $publicDesti = str_replace($app,'',$destination);
+        $files = glob($destination . DIRECTORY_SEPARATOR . "*");
+        natsort($files);
+        $lastFile = pathinfo(end($files), PATHINFO_FILENAME);
+        if (!is_dir($destination)) {
+            mkdir($destination);
+        }
+        $size = count($data);
+        $parte = 10000;
+        $desde = 0;
+        $records = [];
+        $nameFiles = $lastFile ? (int)$lastFile+$parte : 0;
+        while (($desde - $parte) < $size) {
+            $lista = array_slice($data, $desde, $parte, false);
+            $archivo = "$nameFiles.json";
+            $nrmRegistros = count($lista);
+            if($nrmRegistros){
+                $fp = fopen($destination . DIRECTORY_SEPARATOR . $archivo, 'w');
+                fwrite($fp, json_encode($lista));
+                fclose($fp);
+                $records[] = [
+                    'from'=> $desde,
+                    'lenght'=> $nrmRegistros,
+                    'size' => $this->convert(filesize($destination . DIRECTORY_SEPARATOR . $archivo)),
+                    'path'=> $publicDesti . DIRECTORY_SEPARATOR . $archivo,
+                ];
+                unset($lista);
+            }
+            $desde = $desde + $parte;
+            $nameFiles = $nameFiles + $parte;
+        }
+        return $records;
+    }
+
+    private function readFile(string $path)
     {
         $type = mime_content_type($path);
-        switch ($type){
+        switch ($type) {
             case "text/plain":
-                $data = utf8_decode(file_get_contents($path));
+                $data = file_get_contents($path);
                 $data = str_replace("\r", "", $data);
-                $data = explode("\n",$data);
-                $labels = explode("\t",$data[0]);
+                $data = explode("\n", $data);
+                $labels = explode("\t", $data[0]);
                 array_splice($data, 0, 1);
-                foreach ($data as $linea){
-                    $i=0;
-                    $item=explode("\t",$linea);
-                    foreach ($labels as $keys){
-                        $aux[mb_strtolower($keys)]=@$item[$i];
+                foreach ($data as $linea) {
+                    $i = 0;
+                    $item = explode("\t", $linea);
+                    foreach ($labels as $keys) {
+                        $aux[mb_strtolower($keys)] = utf8_encode(@$item[$i]);
                         $i++;
                     }
-                    $nueva[]=$aux;
+                    $nueva[] = $aux;
                 }
                 break;
         }
         return $nueva;
     }
 
-    private function copyFile($obj){
-        $app = sys_get_temp_dir().DIRECTORY_SEPARATOR.config("app.name");
-        if (!is_dir($app)){
+    private function copyFile($obj)
+    {
+        $app = sys_get_temp_dir() . DIRECTORY_SEPARATOR . config("app.name");
+        if (!is_dir($app)) {
             mkdir($app);
         }
         $hash = md5($obj->name);
-        $path = $app.DIRECTORY_SEPARATOR.$hash;
+        $path = $app . DIRECTORY_SEPARATOR . $hash;
         $file = "original.$obj->ext";
-        $filePath = $path.DIRECTORY_SEPARATOR.$file;
-        if (!is_dir($path)){
+        $filePath = $path . DIRECTORY_SEPARATOR . $file;
+        if (!is_dir($path)) {
             mkdir($path);
         }
-        if(!file_exists($filePath)){
+        if (!file_exists($filePath)) {
             copy($obj->href, $filePath);
         }
         return $filePath;
     }
 
-    private function openExcel($obj,$path)
+    private function openExcel($obj, $path)
     {
         $inputFileName = "Prueba.$obj->ext";
 
@@ -130,17 +187,18 @@ class ConsultaCatastrosController extends Controller
         $spreadsheet = $reader->load($inputFileName);
     }
 
-    private function zipFile($path){
+    private function zipFile($path)
+    {
         $zip = Zip::open($path);
         $filePath = dirname($path);
-        $destination = $filePath.DIRECTORY_SEPARATOR."uncompress";
+        $destination = $filePath . DIRECTORY_SEPARATOR . "uncompress";
         $zip->extract($destination);
         $lista = [];
         if ($handle = opendir($destination)) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $lista[] = [
-                        'file'  =>  $destination.DIRECTORY_SEPARATOR.$entry,
+                        'file' => $destination . DIRECTORY_SEPARATOR . $entry,
 //                        'ext'   =>  pathinfo($entry, PATHINFO_EXTENSION)
                     ];
                 }
