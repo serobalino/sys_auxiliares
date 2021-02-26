@@ -16,10 +16,10 @@ class ConsultaCatastrosController extends Controller
     private static function toTexto($dat)
     {
         if (is_string($dat)) {
-//            $dat = mb_convert_encoding($dat, 'UTF-8', 'UTF-8');
+//            $dat = utf8_encode ($dat);
 //            $dat = str_replace("+"," ",$dat);
 //            $dat = iconv("UTF-8", 'ISO-8859-1//TRANSLIT', $dat);
-            $dat = stripslashes($dat);
+//            $dat = urldecode($dat);
             return ($dat);
         } else {
             return $dat;
@@ -50,9 +50,9 @@ class ConsultaCatastrosController extends Controller
         try {
             $url = file_get_contents('https://www.sri.gob.ec/web/guest/catastros');
             $doc = new DOMDocument();
-            $doc->encoding = 'utf-8';
+            $doc->encoding = 'UTF-8';
             libxml_use_internal_errors(true);
-            $doc->loadHTML(utf8_decode($url));
+            $doc->loadHTML(($url));
             $xpath = new DomXPath($doc);
             $elementos = $xpath->query("//div[@class='journal-content-article']//div");
             $nivel = $elementos->item(0);
@@ -72,7 +72,7 @@ class ConsultaCatastrosController extends Controller
                         ];
                     }
                     $aux[] = [
-                        'title' => $titulo->item($i)->nodeValue,
+                        'title' => utf8_decode($titulo->item($i)->nodeValue),
                         'items' => $subnivel
                     ];
                     $i++;
