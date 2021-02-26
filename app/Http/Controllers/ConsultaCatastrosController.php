@@ -178,6 +178,7 @@ class ConsultaCatastrosController extends Controller
     private function readFile(string $path)
     {
         $type = mime_content_type($path);
+        $nueva = [];
         switch ($type) {
             case "text/plain":
                 $data = file_get_contents($path);
@@ -199,6 +200,12 @@ class ConsultaCatastrosController extends Controller
                     }
                     $nueva[] = $aux;
                 }
+                break;
+            case "application/vnd.ms-excel":
+                $nueva = $this->openExcelFiles($path,"Xls");
+                break;
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                $nueva = $this->openExcelFiles($path,"Xlsx");
                 break;
         }
         return $nueva;
@@ -223,20 +230,22 @@ class ConsultaCatastrosController extends Controller
         return $filePath;
     }
 
-    private function openExcel($obj, $path)
+    private function openExcelFiles($path, $tipo)
     {
-        $inputFileName = "Prueba.$obj->ext";
-
-        /**  Identify the type of $inputFileName  **/
-        $spreadsheet = new Spreadsheet();
-
-        $inputFileType = "Xlsx";
+        $inputFileType = $tipo;
         $inputFileName = $path;
-
-        /**  Create a new Reader of the type defined in $inputFileType  **/
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
-        /**  Load $inputFileName to a Spreadsheet Object  **/
-        $spreadsheet = $reader->load($inputFileName);
+        $reader->setReadDataOnly(true);
+        $reader->setLoadAllSheets();
+        $reader->load($inputFileName);
+
+//        $hojas = 1;
+//        $blocco = [];
+//        for ($i = 0; $i < $hojas; $i++) {
+//            $sheet = $hojas->getSheet($i);
+//            $blocco[]= $sheet->toArray(null, true, true, true);
+//        }
+        dd($reader);
     }
 
     private function zipFile($path)

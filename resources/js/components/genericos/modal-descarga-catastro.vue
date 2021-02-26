@@ -81,20 +81,31 @@
             tiempo: 5,
             total: 0,
             completados: 0,
+            pasos:0,
         }),
         props: {
             value: {
                 type: Object
             }
         },
+        watch:{
+            tiempo:function(val){
+                if(val===100){
+                    setTimeout(()=> {
+                        this.cargando = false;
+                    },10000);
+                }
+            },
+        },
         methods: {
             procesar: function () {
-                this.tiempo = 10;
+                this.tiempo = 0;
                 catastros.procesarCatastro(this.value).then((response) => {
                     this.archivos = response.data;
                     this.tiempo = 15;
                     this.total = this.contar(false);
                     this.descargar();
+                    this.pasos=parseInt((0.5 *85)/this.total);
                 });
             },
             contar: function (bandera,elemento=false) {
@@ -122,7 +133,7 @@
                     return i;
             },
             sacarKeys:function(){
-                const labels = Object.keys(this.data[0]);
+                const labels = Object.keys(this.data.length ? this.data[0] : []);
                 let columnas = [];
                 labels.forEach(i=>{
                     columnas.push({
@@ -135,14 +146,13 @@
                 });
                 this.columns=columnas;
                 this.tiempo = 100;
-                setTimeout(()=> {
-                    this.cargando = false;
-                },5000);
             },
             descargar: function () {
                 const file = this.contar(true);
+                this.tiempo+=this.pasos;
                 if (file) {
                     catastros.descargarCatastro(file).then((response) => {
+                        this.tiempo+=this.pasos;
                         this.data.push(...response.data);
                         this.contar(false,file);
                         this.descargar();
