@@ -392,3 +392,13 @@
   background: transparent
 }
 
+.todo{
+  .modal-xl{
+    max-width: 95% !important;
+  }
+}
+.b-overlay{
+  .position-absolute{
+    width: 100%
+  }
+}

@@ -11,7 +11,6 @@
     },
     "devDependencies": {
         "axios": "^0.18",
-        "bootstrap": "^4.1.0",
         "cross-env": "^5.1",
         "jquery": "^3.2",
         "laravel-mix": "^4.0.7",
@@ -24,10 +23,12 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
-        "bootstrap-vue": "^2.0.0-rc.22",
+        "bootstrap": "^4.6.0",
+        "bootstrap-vue": "^2.21.2",
         "font-awesome": "^4.7.0",
         "js-file-download": "^0.4.8",
         "luxon": "^1.16.0",
+        "pretty-file-icons": "^2.2.1",
         "vee-validate": "^2.2.9",
         "vue-datetime": "^1.0.0-beta.10",
         "vue-good-table": "^2.16.5",
