@@ -7,7 +7,7 @@
                     :pagination-options="{
                         enabled: true,
                         mode: 'comprobantes',
-                        perPage: 50,
+                        perPage: 5,
                         dropdownAllowAll: true,
                         nextLabel: 'siguiente',
                         prevLabel: 'anterior',
