@@ -13,12 +13,10 @@ export default {
             }
         });
     },
-    xml(archivos,cliente){
+    xml(archivo,cliente){
         const data = new FormData();
-        for( let i = 0; i < archivos.length; i++ ){
-            data.append('archivos[' + i + ']', archivos[i]);
-        }
         data.append('cliente', cliente.id_cl);
+        data.append('archivos[0]', archivo);
         return axios.post(PREFIJO+"/comprobante",data, {
             headers: {
                 'Content-Type': 'multipart/form-data'
