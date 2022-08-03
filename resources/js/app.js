@@ -10,6 +10,7 @@ window.Vue = require('vue');
 
 import BootstrapVue from 'bootstrap-vue';
 import VueIziToast from "vue-izitoast";
+import VueClipboard from 'vue-clipboard2';
 import VeeValidate from 'vee-validate';
 import es from 'vee-validate/dist/locale/es';
 import store from './store';
@@ -38,6 +39,7 @@ files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(
 
 Vue.use(BootstrapVue);
 Vue.use(VueIziToast);
+Vue.use(VueClipboard)
 Vue.use(VeeValidate, {
     locale: 'es',
     dictionary: {
