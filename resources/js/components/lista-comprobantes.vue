@@ -15,8 +15,10 @@
                 <div class="alert alert-danger" role="alert" v-if="mensaje.estado===2">
                     <span v-html="mensaje.texto"></span>
                 </div>
-                <div class="alert alert-success" role="alert" v-if="mensaje.estado===3">
-                    <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                <div v-if="mensaje.estado===3">
+                    <div class="alert alert-success" role="alert" >
+                        <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                    </div>
                 </div>
             </div>
 
@@ -31,7 +33,7 @@
                  no-close-on-backdrop hide-header-close v-if="cliente">
             <div v-if="subiendo">
                 <div class="alert alert-warning" role="alert">
-                    <div class="spinner-border text-primary" role="status"></div>
+                    <b-progress :value="subidaXML.archivos" :max="archivo.length" show-progress animated/>
                     Procesando
                 </div>
             </div>
@@ -42,8 +44,29 @@
                 <div class="alert alert-danger" role="alert" v-if="mensaje.estado===2">
                     <span v-html="mensaje.texto"></span>
                 </div>
-                <div class="alert alert-success" role="alert" v-if="mensaje.estado===3">
-                    <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                <div v-if="mensaje.estado===3">
+                    <div class="alert alert-success" role="alert" >
+                        <i class="fa fa-thumbs-up"></i> <span v-html="mensaje.texto"></span>
+                        <button class="btn btn-info" v-on:click="limpiar">Limpiar</button>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p>Archivos guardados</p>
+                            <b-table striped hover fixed small :items="subidaXML.lista.guardados" :fields="exitoTabla">
+                                <template #empty="scope">
+                                    <h4>No existen XML guardados</h4>
+                                </template>
+                            </b-table>
+                        </div>
+                        <div class="col-6">
+                            <p>Archivos con error</p>
+                            <b-table striped hover fixed small :items="subidaXML.lista.errores" :fields="errorTabla" table-variant="danger">
+                                <template #empty="scope">
+                                    <h4>No existen archivos con errores</h4>
+                                </template>
+                            </b-table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -68,8 +91,19 @@
                     <span v-if="cliente.email_cl"><b>Email</b> <a
                         :href="'mailto:'+cliente.email_cl">{{ cliente.email_cl }}</a><br></span>
                     <template v-if="cliente.contrasenas.length">
-                        <span
-                            v-for="item in cliente.contrasenas"><b>Contranseña de {{ item.label.nombre_tc }}</b> {{ item.contrasena_hc }}</span>
+                        <span v-for="item in cliente.contrasenas">
+                            <b>Contranseña de {{ item.label.nombre_tc }}</b>
+                            <span
+                                v-clipboard:copy="item.contrasena_hc"
+                                v-clipboard:success="onCopy"
+                                @mousedown="show=true"
+                                @mouseup="show=false"
+                                @mouseleave="show=false"
+                                class="btn p-0"
+                            >
+                                {{ show ? item.contrasena_hc : '*'.repeat(item.contrasena_hc.length) }} <i class="fa fa-eye" :class="{'fa-eye':show,'fa-eye-slash':!show}"></i>
+                            </span>
+                        </span>
                     </template>
                 </p>
             </b-alert>
@@ -162,6 +196,26 @@ export default {
     },
     data() {
         return {
+            exitoTabla: [
+                {
+                    key: 'name',
+                    label: 'Archivo',
+                    sortable: true,
+                }
+            ],
+            errorTabla: [
+                {
+                    key: 'name',
+                    label: 'Archivo',
+                    sortable: true,
+                },
+                {
+                    key: 'error',
+                    label: 'Observación',
+                    sortable: true,
+                },
+            ],
+            show: false,
             archivo: null,
             desde: null,
             hasta: null,
@@ -213,9 +267,24 @@ export default {
             textoTabla: "Elija un cliente",
             cargandoBs: false,
             cargandoEx: false,
+            subidaXML:{
+                start: false,
+                archivos: 0,
+                lista: {
+                    guardados: [],
+                    errores: []
+                }
+            }
         }
     },
     methods: {
+        limpiar: function(){
+            this.mensaje.estado=1;
+            this.mensaje.texto = "Suba el resumen de comprobantes del cliente \n" + this.cliente.apellidos_cl + " " + this.cliente.nombres_cl + "</b>";
+        },
+        onCopy: function () {
+            this.$toast.info("Se ha copiado la contraseña de "+this.cliente.razon_cl);
+        },
         filtrarValor: function (data, filterString) {
             let x = parseFloat(filterString);
             return data >= x && data <= x + x;
@@ -290,26 +359,54 @@ export default {
                 });
             }
         },
+        aftterUpload: function(){
+            this.subiendo = false;
+            this.mensaje.estado = 3;
+            this.archivo = null;
+            this.mensaje.texto = "Se ha procesado "+this.subidaXML.archivos+" archivos"
+        },
         subir2: function () {
+            this.subidaXML={
+                start: false,
+                archivos: 0,
+                lista: {
+                    guardados: [],
+                    errores: []
+                }
+            }
             if (this.archivo) {
                 this.subiendo = true;
-                servicios.archivos.xml(this.archivo, this.cliente).then((response) => {
-                    if (response.data.guardados > 0)
-                        this.consulta();
-                    this.subiendo = false;
-                    this.mensaje.estado = 3;
-                    this.mensaje.texto = response.data;
-                    let lista = "";
-                    lista += this.archivo.map(i => {
-                        return i.name + "</br>";
+                this.subidaXML.start = true;
+                this.archivo.forEach(i=>{
+                    servicios.archivos.xml(i, this.cliente).then((response) => {
+                        this.subidaXML.archivos++;
+                        if(response.data.guardados){
+                            this.subidaXML.lista.guardados.push({
+                                name: i.name,
+                                feedback: response.data,
+                            })
+                        }else{
+                            this.subidaXML.lista.errores.push({
+                                name: i.name,
+                                feedback: response.data,
+                                error: response.data.existentes ? "Ya existe" : "No pertenece al cliente",
+                            })
+                        }
+                        if(this.subidaXML.archivos===this.archivo.length){
+                            this.aftterUpload()
+                        }
+                    }).catch(a=>{
+                        this.subidaXML.archivos++;
+                        this.subidaXML.lista.errores.push({
+                            name: i.name,
+                            feedback: a.data,
+                            error: "Archivo invalido",
+                        })
+                        if(this.subidaXML.archivos===this.archivo.length){
+                            this.aftterUpload()
+                        }
                     });
-                    this.$toast.show(lista, 'Completado');
-                    this.archivo = null;
-                }).catch(error => {
-                    this.subiendo = false;
-                    this.mensaje.estado = 2;
-                    this.mensaje.texto = error.response.data.message;
-                });
+                })
             }
         }
     },
