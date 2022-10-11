@@ -285,6 +285,6 @@
 <style scoped>
 .max-he{
     max-height: 63vh;
-    overflow: scroll;
+    overflow-y: scroll;
 }
 </style>
