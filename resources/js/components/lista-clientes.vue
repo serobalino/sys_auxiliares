@@ -19,14 +19,14 @@
                             size="sm"
                     ></b-form-input>
                 </b-form-group>
-                <b-list-group flush>
+                <b-list-group flush class="max-he">
                     <b-list-group-item
-                            :href="'#'+item.dni_cl"
-                            v-for="item in filtrar"
-                            :key="item.id_cl"
-                            :active="item.id_cl===picker.id_cl"
-                            v-on:click="seleccionar(item)"
-                            v-on:dblclick="editar(item)"
+                        :href="'#'+item.dni_cl"
+                        v-for="item in filtrar"
+                        :key="item.id_cl"
+                        :active="item.id_cl===picker.id_cl"
+                        v-on:click="seleccionar(item)"
+                        v-on:dblclick="editar(item)"
                     >{{item.apellidos_cl+" "+item.nombres_cl}}</b-list-group-item>
                 </b-list-group>
                 <div class="text-center" v-if="filtrar.length===0">
@@ -283,5 +283,8 @@
 </script>
 
 <style scoped>
-
+.max-he{
+    max-height: 63vh;
+    overflow: scroll;
+}
 </style>

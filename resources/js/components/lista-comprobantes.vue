@@ -73,7 +73,7 @@
             <b-form-file accept=".xml" browse-text="Examinar" :file-name-formatter="formatNames" v-model="archivo"
                          :disabled="subiendo" multiple placeholder="Elija varios archivos"></b-form-file>
             <div class="text-center mt-3">
-                <button class="btn btn-info" v-on:click="subir2" :disabled="subiendo">Subir</button>
+                <button class="btn btn-info" v-on:click="subir2" :disabled="disabledUpload">Subir</button>
                 <button class="btn btn-danger" v-on:click="ocultarModal" :disabled="subiendo">Cancelar</button>
             </div>
         </b-modal>
@@ -192,6 +192,15 @@ export default {
         },
         hasta: function () {
             this.excel = false;
+        }
+    },
+    computed: {
+        disabledUpload: function() {
+            try{
+                return this.subiendo || this.archivo.length===0
+            } catch (e) {
+                return true
+            }
         }
     },
     data() {
