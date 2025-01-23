@@ -15,7 +15,7 @@
                             v-model="buscar"
                             type="text"
                             required
-                            placeholder="Carlos Tirado"
+                            placeholder="ASECONT PUYO"
                             size="sm"
                     ></b-form-input>
                 </b-form-group>

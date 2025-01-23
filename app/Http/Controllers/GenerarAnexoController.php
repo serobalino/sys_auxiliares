@@ -257,7 +257,7 @@ class GenerarAnexoController extends Controller
 
         $fila++;
         Date::setLocale('es');
-        $data   =   $this->comprobantes->consulta($id,$request->desde,$request->hasta);
+        $data   =   $this->comprobantes->consulta($id,$request->desde,$request->hasta,$request->comprobante);
         foreach ($data as $nivel){
             //fecha
             $fecha  =   Date::createFromFormat('Y-m-d',$nivel->fecha_co);
@@ -604,7 +604,7 @@ class GenerarAnexoController extends Controller
      */
     public function update(RangoRequest $request, $id)
     {
-        $lista  = $this->comprobantes->consulta($id,$request->desde,$request->hasta);
+        $lista  = $this->comprobantes->consulta($id,$request->desde,$request->hasta,$request->comprobante);
         return response($lista);
     }
 

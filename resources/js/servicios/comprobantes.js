@@ -4,15 +4,16 @@ const PREFIJO="/app/comprobantes";
 
 export default {
 
-    update(cliente,desde,hasta) {
+    update(cliente,desde,hasta,comprobantes=[]) {
         const id=cliente.id_cl;
-        return axios.patch(PREFIJO+"/"+id,{desde:desde,hasta:hasta});
+        return axios.patch(PREFIJO+"/"+id,{desde:desde,hasta:hasta,comprobante:comprobantes});
     },
-    descargar(cliente,desde,hasta) {
+    descargar(cliente,desde,hasta,comprobantes=[]) {
         return axios.get(PREFIJO+"/"+cliente.id_cl,{
             params:{
                 desde:desde,
-                hasta:hasta
+                hasta:hasta,
+                comprobante:comprobantes
             },
             responseType: 'blob'
         });

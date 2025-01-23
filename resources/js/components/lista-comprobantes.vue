@@ -51,7 +51,7 @@
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <p>Archivos guardados</p>
+                            <p class="text-success">Comprobantes guardados ({{subidaXML.lista.guardados.length}})</p>
                             <b-table striped hover fixed small :items="subidaXML.lista.guardados" :fields="exitoTabla">
                                 <template #empty="scope">
                                     <h4>No existen XML guardados</h4>
@@ -59,7 +59,7 @@
                             </b-table>
                         </div>
                         <div class="col-6">
-                            <p>Archivos con error</p>
+                            <p class="text-error">Comprobantes con error ({{subidaXML.lista.errores.length}})</p>
                             <b-table striped hover fixed small :items="subidaXML.lista.errores" :fields="errorTabla" table-variant="danger">
                                 <template #empty="scope">
                                     <h4>No existen archivos con errores</h4>
@@ -112,6 +112,20 @@
             </b-alert>
             <div class="form-row">
                 <div class="form-group col-md-6">
+                    <label>Comprobante</label>
+                    <b-form-checkbox-group
+                        size="sm"
+                        v-model="comprobantes"
+                        :options="tipoComprobantes"
+                        class="mb-3"
+                        value-field="value"
+                        text-field="text"
+                        disabled-field="notEnabled"
+                    />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
                     <label>Desde</label>
                     <datetime v-model="desde" input-class="form-control" placeholder="Elija una fecha" :auto="true"
                               :phrases="{ok:'Aceptar',cancel:'Cancelar'}" value-zone="UTC-5"/>
@@ -127,7 +141,7 @@
                     <i class="fa" :class="cargandoEx ? 'fa-spin fa-spinner' :'fa-file-excel-o'"/>
                     {{ cargandoEx ? 'Generando Excel' : 'Generar Excel' }}
                 </button>
-                <button class="btn btn-primary" :disabled="cargandoBs" v-on:click="consulta">
+                <button class="btn btn-primary" :disabled="cargandoBs || cargandoEx" v-on:click="consulta">
                     <i class="fa fa-spin fa-spinner" v-if="cargandoBs"/>
                     Buscar
                 </button>
@@ -205,6 +219,7 @@ export default {
     },
     data() {
         return {
+            tipoComprobantes: [{"value": 1, "text": "Factura"},{"value": 4, "text": "Nota de Crédito"},{"value": 5, "text": "Nota de Débito"},{"value": 7, "text": "Comprobante de Retención"}],
             exitoTabla: [
                 {
                     key: 'name',
@@ -228,6 +243,7 @@ export default {
             archivo: null,
             desde: null,
             hasta: null,
+            comprobantes: [1,4,5,7],
             columns: [
                 {
                     label: 'Fecha',
@@ -324,7 +340,7 @@ export default {
                 this.mensaje.texto = "Suba el resumen de comprobantes del cliente \n" + this.cliente.apellidos_cl + " " + this.cliente.nombres_cl + "</b>";
                 this.filas = [];
                 this.textoTabla = "Procesando datos";
-                servicios.comprobantes.update(this.cliente, this.desde, this.hasta).then((response) => {
+                servicios.comprobantes.update(this.cliente, this.desde, this.hasta, this.comprobantes).then((response) => {
                     this.filas = response.data;
                     this.textoTabla = "No tiene comprobantes registrados";
                     this.cargandoBs=false;
@@ -342,7 +358,7 @@ export default {
         },
         descargarExcel: function () {
             this.cargandoEx=true;
-            servicios.comprobantes.descargar(this.cliente, this.desde, this.hasta).then((response) => {
+            servicios.comprobantes.descargar(this.cliente, this.desde, this.hasta, this.comprobantes).then((response) => {
                 let fileDownload = require('js-file-download');
                 fileDownload(response.data, response.headers.nombre);
                 this.cargandoEx=false;
