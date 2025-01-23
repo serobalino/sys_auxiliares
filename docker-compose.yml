@@ -1,0 +1,26 @@
+services:
+  app:
+    image: php:7.3-cli
+    container_name: laravel_app_asecont
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c "
+        curl -sS https://getcomposer.org/installer | php -- --version=1.10.26 && \
+        mv composer.phar /usr/local/bin/composer && \
+        docker-php-ext-install pdo_mysql &&
+        composer install --ignore-platform-reqs &&
+        if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi &&
+        php artisan serve --host 0.0.0.0
+      "
+
+  node:
+    image: node:8
+    container_name: laravel_node_asecont
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: ["sh", "-c", "npm install && npm run watch"]
