@@ -9,6 +9,7 @@ services:
       - "8000:8000"
     command: >
       bash -c "
+        echo 'memory_limit = 2024M' >> /usr/local/etc/php/conf.d/50-memory-limit.ini &&
         curl -sS https://getcomposer.org/installer | php -- --version=1.10.26 && \
         mv composer.phar /usr/local/bin/composer && \
         docker-php-ext-install pdo_mysql &&

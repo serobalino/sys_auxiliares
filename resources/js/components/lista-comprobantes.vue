@@ -120,7 +120,7 @@
                         class="mb-3"
                         value-field="value"
                         text-field="text"
-                        disabled-field="notEnabled"
+                        :disabled="cargandoBs || cargandoEx"
                     />
                 </div>
             </div>
@@ -128,16 +128,18 @@
                 <div class="form-group col-md-6">
                     <label>Desde</label>
                     <datetime v-model="desde" input-class="form-control" placeholder="Elija una fecha" :auto="true"
+                              :disabled="cargandoBs || cargandoEx"
                               :phrases="{ok:'Aceptar',cancel:'Cancelar'}" value-zone="UTC-5"/>
                 </div>
                 <div class="form-group col-md-6">
                     <label>Hasta</label>
                     <datetime v-model="hasta" input-class="form-control" placeholder="Elija una fecha" :auto="true"
+                              :disabled="cargandoBs || cargandoEx"
                               :phrases="{ok:'Aceptar',cancel:'Cancelar'}" value-zone="UTC-5"/>
                 </div>
             </div>
             <div class="botones text-right">
-                <button class="btn btn-success" :disabled="cargandoEx" v-if="excel" v-on:click="descargarExcel">
+                <button class="btn btn-success" :disabled="cargandoBs || cargandoEx" v-if="excel" v-on:click="descargarExcel">
                     <i class="fa" :class="cargandoEx ? 'fa-spin fa-spinner' :'fa-file-excel-o'"/>
                     {{ cargandoEx ? 'Generando Excel' : 'Generar Excel' }}
                 </button>
